@@ -26,25 +26,25 @@
       border-bottom: 1px solid rgba(86, 109, 196, 0.15);
     }
     .brand-title { font-size: 42px; font-weight: 700; color: var(--blue); font-family: Georgia, serif; }
-    .nav { display: flex; gap: 15px; }
+    .nav { display: flex; gap: 15px; align-items: center; }
     .nav-link, .login-button {
       padding: 12px 20px; text-align: center; font-size: 18px; color: var(--blue);
       border: 2px solid transparent; cursor: pointer; background: none; border-radius: 12px; transition: 0.2s;
     }
     .nav-link.active { border-color: rgba(83, 109, 204, 0.55); background: rgba(255, 255, 255, 0.2); font-weight: bold; }
-    .login-button { border: 3px solid #6175ca; background: #d6f1dc; }
+    .login-button { border: 3px solid #6175ca; background: #d6f1dc; font-weight: bold; }
     .nav-link:hover, .login-button:hover { transform: translateY(-1px); opacity: 0.9; }
 
     /* Вкладки (Тобы) */
     .tab-content { display: none; max-width: 1100px; margin: 40px auto; padding: 20px; }
     .tab-content.active { display: grid; grid-template-columns: 45% 55%; gap: 40px; align-items: center; }
+    #auth-tab.active { display: block; max-width: 450px; }
     
     .pane-left { text-align: center; }
     .hero-image { width: 100%; max-width: 500px; }
     
     .home-content h1 { font-size: 48px; color: var(--blue); margin-bottom: 20px; font-family: Georgia, serif; }
     .home-text { font-size: 20px; line-height: 1.5; margin-bottom: 20px; }
-    .home-list { margin-left: 20px; font-size: 18px; line-height: 2; margin-bottom: 20px; }
 
     /* Карточки категорий на Главной */
     .stats-features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 30px; }
@@ -52,16 +52,17 @@
     .feature-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.05); }
     .feature-card h3 { color: var(--blue); margin-bottom: 8px; }
 
-    /* Модальные окна (Всплывашки) */
+    /* Модальные окна */
     .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.25s ease; }
     .modal.show { display: flex; opacity: 1; }
     .modal-box { background: var(--bg); width: 90%; max-width: 1000px; max-height: 85vh; overflow-y: auto; border-radius: 24px; padding: 30px; position: relative; display: grid; grid-template-columns: 40% 60%; gap: 30px; }
     .close-modal { position: absolute; top: 15px; right: 20px; font-size: 30px; cursor: pointer; color: var(--muted); }
 
-    /* Базовые компоненты форм и таблиц внутри модалок */
+    /* Базовые компоненты форм и таблиц */
     .toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
-    .toolbar input, .login-form input { height: 40px; padding: 0 12px; border: 2px solid rgba(87,114,204,0.3); border-radius: 10px; outline: none; font-size: 14px; }
-    .toolbar button, .row-actions button, .login-form button { height: 40px; padding: 0 16px; border: none; border-radius: 10px; background: var(--blue); color: #fff; cursor: pointer; font-size: 14px; }
+    .toolbar input, .auth-form input { height: 42px; padding: 0 14px; border: 2px solid rgba(87,114,204,0.3); border-radius: 10px; outline: none; font-size: 14px; width: 100%; }
+    .toolbar input { width: auto; }
+    .toolbar button, .row-actions button, .auth-form button { height: 42px; padding: 0 16px; border: none; border-radius: 10px; background: var(--blue); color: #fff; cursor: pointer; font-size: 15px; font-weight: bold; }
     .row-actions button { background: #7e91df; margin-top: 10px; }
     .hint { font-size: 13px; color: #5f6d91; margin-bottom: 10px; }
 
@@ -87,11 +88,12 @@
     .bar-label { margin-top: 6px; font-size: 13px; }
     .bar-value { margin-bottom: 4px; font-size: 13px; font-weight: bold; color: var(--blue-dark); }
 
-    /* Авторизация */
-    .login-card { background: #fff; border-radius: 20px; padding: 30px; border: 2px solid rgba(87,114,204,0.2); text-align: center; }
-    .login-form { display: grid; gap: 12px; margin-top: 15px; }
-    .login-form button { font-size: 16px; font-weight: bold; }
-
+    /* Авторизация (Карточка) */
+    .auth-card { background: #fff; border-radius: 24px; padding: 35px; border: 2px solid rgba(87,114,204,0.15); box-shadow: 0 10px 25px rgba(0,0,0,0.03); }
+    .auth-card h2 { margin-bottom: 20px; color: var(--blue); font-family: Georgia, serif; text-align: center; }
+    .auth-form { display: grid; gap: 14px; }
+    .auth-toggle { margin-top: 20px; text-align: center; font-size: 14px; color: var(--blue); cursor: pointer; text-decoration: underline; }
+    
     .toast { position: fixed; right: 20px; bottom: 20px; z-index: 300; background: rgba(55, 75, 159, 0.95); color: white; padding: 12px 20px; border-radius: 10px; font-size: 14px; opacity: 0; transform: translateY(10px); pointer-events: none; transition: 0.25s; }
     .toast.show { opacity: 1; transform: translateY(0); }
   </style>
@@ -106,7 +108,7 @@
       <button class="nav-link" onclick="openModal('trainingModal')">Дневник тренировок</button>
       <button class="nav-link" onclick="openModal('nutritionModal')">Дневник питания</button>
       <button class="nav-link" onclick="openModal('bodyModal')">Оценка тела</button>
-      <button class="login-button" onclick="switchTab('login')">Вход</button>
+      <button class="login-button" id="headerAuthBtn" onclick="switchTab('auth-tab')">Вход / Регистрация</button>
     </nav>
   </header>
 
@@ -131,6 +133,31 @@
           <p>Мониторинг изменений веса и калькулятор ИМТ.</p>
         </div>
       </div>
+    </div>
+  </section>
+
+  <section class="tab-content" id="auth-tab">
+    <div class="auth-card" id="login-block">
+      <h2>Вход в систему</h2>
+      <form class="auth-form" onsubmit="handleAuth(event, 'login')">
+        <input type="text" id="loginUser" placeholder="Логин или Email" required />
+        <input type="password" id="loginPass" placeholder="Пароль" required />
+        <button type="submit">Войти</button>
+      </form>
+      <div class="auth-toggle" onclick="toggleAuthForms(false)">Нет аккаунта? Зарегистрироваться</div>
+    </div>
+
+    <div class="auth-card" id="register-block" style="display: none;">
+      <h2>Регистрация</h2>
+      <form class="auth-form" onsubmit="handleAuth(event, 'register')">
+        <input type="text" id="regName" placeholder="Ваше имя" required />
+        <input type="text" id="regUser" placeholder="Придумайте логин" required />
+        <input type="email" id="regEmail" placeholder="Email" required />
+        <input type="password" id="regPass" placeholder="Пароль" required />
+        <input type="password" id="regPassConfirm" placeholder="Повторите пароль" required />
+        <button type="submit">Создать аккаунт</button>
+      </form>
+      <div class="auth-toggle" onclick="toggleAuthForms(true)">Уже есть аккаунт? Войти</div>
     </div>
   </section>
 
@@ -217,23 +244,10 @@
     </div>
   </div>
 
-  <section class="tab-content" id="login">
-    <div style="grid-column: span 2; max-width: 400px; margin: 0 auto; width: 100%;">
-      <div class="login-card">
-        <h2>Вход в систему</h2>
-        <form class="login-form" onsubmit="event.preventDefault(); showToast('Код отправлен на указанный номер!');">
-          <input type="tel" placeholder="+7 (700) 000-00-00" required pattern="[0-9+-\s()]+" />
-          <input type="password" placeholder="Пароль" />
-          <button type="submit">Получить SMS-код</button>
-        </form>
-      </div>
-    </div>
-  </section>
-
   <div class="toast" id="toast"></div>
 
   <script>
-    // Инициализация дефолтных данных
+    // Дефолтные данные
     const DEFAULT_DATA = {
       training: [{ name: 'Шаги', value: '8523', date: '2026-04-07' }, { name: 'Велоспорт', value: '3.1 км', date: '2026-04-09' }],
       nutrition: [{ breakfast: '560', lunch: '415', dinner: '638', date: '2026-04-07' }, { breakfast: '783', lunch: '345', dinner: '670', date: '2026-04-08' }],
@@ -247,13 +261,37 @@
       selectedNutritionIndex: 0
     };
 
-    // Переключение основных вкладок (Главная / Вход)
+    // Навигация по вкладкам
     function switchTab(tabId) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-      document.getElementById(tabId).classList.add('active');
+      const activeTab = document.getElementById(tabId);
+      if(activeTab) activeTab.classList.add('active');
     }
 
-    // Управление Всплывающими Окнами (Modals)
+    // Переключение между Входом и Регистрацией внутри вкладки
+    function toggleAuthForms(showLogin) {
+      document.getElementById('login-block').style.display = showLogin ? 'block' : 'none';
+      document.getElementById('register-block').style.display = showLogin ? 'none' : 'block';
+    }
+
+    // Логика авторизации
+    function handleAuth(event, type) {
+      event.preventDefault();
+      if (type === 'register') {
+        const pass = document.getElementById('regPass').value;
+        const confirm = document.getElementById('regPassConfirm').value;
+        if (pass !== confirm) {
+          showToast('Ошибка: Пароли не совпадают!');
+          return;
+        }
+        showToast('Регистрация успешна! Добро пожаловать.');
+      } else {
+        showToast('Вы успешно вошли в систему.');
+      }
+      switchTab('home');
+    }
+
+    // Управление модальными окнами
     function openModal(id) {
       const modal = document.getElementById(id);
       modal.style.display = 'flex';
@@ -269,10 +307,10 @@
       if(e.target.classList.contains('modal')) closeModal(e.target.id);
     }
 
-    // Вспомогательные утилиты
+    // Утилиты уведомлений и форматирования
     function showToast(msg) {
       const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show');
-      clearTimeout(window.tTimer); window.tTimer = setTimeout(() => t.classList.remove('show'), 2000);
+      clearTimeout(window.tTimer); window.tTimer = setTimeout(() => t.classList.remove('show'), 2500);
     }
     function fmtDate(d) { if(!d) return ''; const p = d.split('-'); return p.length===3 ? `${p[2]}.${p[1]}.${p[0]}` : d; }
     function pNum(v) { return parseFloat(String(v).replace(',', '.')) || 0; }
@@ -286,15 +324,13 @@
       return el;
     }
 
-    // Обновление графиков
+    // Графики
     function updateCharts() {
-      // Тренировки
       const totalSteps = state.training.reduce((s, r) => s + pNum(r.value), 0);
       const percent = Math.min(100, Math.round((totalSteps / 32000) * 100));
       document.getElementById('trainingDonut').style.background = `conic-gradient(var(--blue-dark) ${percent * 3.6}deg, #d5d5d5 0deg)`;
       document.getElementById('trainingPercent').textContent = `${percent}%`;
 
-      // Питание
       const row = state.nutrition[state.selectedNutritionIndex] || { breakfast: 0, lunch: 0, dinner: 0, date: '' };
       ['breakfast', 'lunch', 'dinner'].forEach(k => {
         const val = pNum(row[k]);
@@ -304,14 +340,13 @@
       document.getElementById('nutritionSelectedDate').textContent = row.date ? `Данные за ${fmtDate(row.date)}` : 'Выберите дату';
     }
 
-    // Рендеринг таблиц
+    // Рендер таблиц
     function renderTable(id, callback) {
       const tbody = document.querySelector(`#${id}Table tbody`);
       if(tbody) { tbody.innerHTML = ''; state[id].forEach((row, idx) => tbody.appendChild(callback(row, idx))); }
     }
 
     function renderAll() {
-      // Рендер тренировок
       renderTable('training', (row, idx) => {
         const tr = document.createElement('tr');
         tr.insertCell().appendChild(createCell(row.name, v => { state.training[idx].name = v; save('training'); }));
@@ -320,7 +355,6 @@
         return tr;
       });
 
-      // Рендер питания
       renderTable('nutrition', (row, idx) => {
         const tr = document.createElement('tr');
         ['breakfast', 'lunch', 'dinner'].forEach(k => {
@@ -333,7 +367,6 @@
         return tr;
       });
 
-      // Рендер тела
       renderTable('body', (row, idx) => {
         const tr = document.createElement('tr');
         tr.insertCell().appendChild(createCell(row.current, v => { state.body[idx].current = v; save('body'); }));
@@ -345,7 +378,7 @@
       updateCharts();
     }
 
-    // Функции добавления данных
+    // Добавление данных
     function addTraining() {
       const name = document.getElementById('trainingNameInput').value.trim();
       const value = document.getElementById('trainingValueInput').value.trim();
@@ -362,7 +395,7 @@
       const date = document.getElementById('nutritionDateInput').value;
       state.nutrition.push({ breakfast, lunch, dinner, date });
       state.selectedNutritionIndex = state.nutrition.length - 1;
-      save('nutrition'); renderAll(); showToast('Данные добавлены');
+      save('nutrition'); renderAll(); showToast('Данные добавлена');
     }
 
     function addBody() {
@@ -373,7 +406,6 @@
       showToast('Запись веса добавлена');
     }
 
-    // Удаление и очистка
     function removeLast(key) {
       if(!state[key].length) return; state[key].pop();
       if(key === 'nutrition') state.selectedNutritionIndex = Math.max(0, state.nutrition.length - 1);
@@ -385,7 +417,6 @@
       save(key); renderAll(); showToast('Таблица очищена');
     }
 
-    // Стартовый рендер
     renderAll();
   </script>
 </body>

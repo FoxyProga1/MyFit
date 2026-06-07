@@ -20,7 +20,6 @@
 
     body {
       margin: 0;
-      /* Убрали жесткую минимальную ширину 1320px, чтобы сайт сжимался под экраны телефонов */
       min-width: 320px; 
       background: var(--bg);
       color: var(--text);
@@ -30,7 +29,7 @@
     a { color: inherit; text-decoration: none; }
     .page { width: 100%; overflow-x: hidden; }
 
-    /* ХЕДЕР СДЕЛАЛИ АДАПТИВНЫМ */
+    /* ХЕДЕР */
     .site-header {
       position: sticky;
       top: 0;
@@ -46,12 +45,10 @@
       border-bottom: 1px solid rgba(86, 109, 196, 0.15);
     }
 
-    .brand {
-      display: inline-block;
-    }
+    .brand { display: inline-block; }
 
     .brand-title {
-      font-size: 42px; /* Уменьшили базовый гигантский размер для универсальности */
+      font-size: 42px;
       line-height: 0.92;
       font-weight: 700;
       letter-spacing: -1px;
@@ -88,6 +85,7 @@
       color: var(--blue);
       border: 2px solid transparent;
       transition: 0.2s ease;
+      cursor: pointer;
     }
 
     .nav-link:hover,
@@ -109,12 +107,12 @@
       padding: 10px 18px;
     }
 
-    /* СЕКЦИИ ТЕПЕРЬ НА FLEXBOX ДЛЯ УДОБНОГО ПЕРЕВОРОТА НА МОБИЛКАХ */
+    /* СЕКЦИИ */
     .section {
       min-height: calc(100vh - 120px);
       scroll-margin-top: 120px;
       display: flex;
-      flex-direction: row; /* На компах в ряд */
+      flex-direction: row;
       background: var(--bg);
       margin-top: 24px;
       padding-top: 24px;
@@ -131,7 +129,6 @@
       justify-content: center;
     }
 
-    /* Специфичные фиксы панелей */
     .home-left { background: #f3f3f3; border-right: 1px solid #ececec; width: 44%; }
     .home-right { background: #f6f6f6; width: 56%; }
 
@@ -177,24 +174,12 @@
       letter-spacing: 2px;
     }
 
-    .home-list {
-      margin: 14px 0 0;
-      padding-left: 20px;
-    }
-
+    .home-list { margin: 14px 0 0; padding-left: 20px; }
     .home-list li { margin-bottom: 12px; }
 
-    .panel-wrap {
-      width: 100%;
-      max-width: 400px;
-    }
+    .panel-wrap { width: 100%; max-width: 400px; }
+    .donut-card { width: 100%; text-align: center; }
 
-    .donut-card {
-      width: 100%;
-      text-align: center;
-    }
-
-    /* Сделали круг адаптивным, чтобы не вылезал за экран */
     .donut {
       width: 280px;
       height: 280px;
@@ -248,7 +233,7 @@
 
     .data-toolbar input {
       height: 42px;
-      flex: 1 1 140px; /* Инпуты теперь могут сжиматься и переноситься */
+      flex: 1 1 140px;
       padding: 0 12px;
       border: 2px solid rgba(87, 114, 204, 0.45);
       border-radius: 12px;
@@ -276,7 +261,6 @@
       color: #5f6d91;
     }
 
-    /* АДАПТИВНОСТЬ ТАБЛИЦ: Обертка, чтобы таблицы можно было скроллить пальцем */
     .table-container {
       width: 100%;
       overflow-x: auto;
@@ -300,7 +284,7 @@
       text-align: center;
       vertical-align: middle;
       padding: 6px 8px;
-      white-space: nowrap; /* Чтобы текст в мобилке не ломался некрасиво */
+      white-space: nowrap;
     }
 
     .section-table th {
@@ -355,11 +339,7 @@
       font-size: 14px;
     }
 
-    /* ГРАФИК ПИТАНИЯ СДЕЛАЛИ ОТНОСИТЕЛЬНЫМ */
-    .bars-card {
-      width: 100%;
-      max-width: 450px;
-    }
+    .bars-card { width: 100%; max-width: 450px; }
 
     .chart-area {
       position: relative;
@@ -439,18 +419,8 @@
       text-align: center;
     }
 
-    .bmi-card {
-      width: 100%;
-      max-width: 500px;
-      text-align: center;
-    }
-
-    .bmi-image {
-      width: 100%;
-      height: auto;
-      display: block;
-      margin: 0 auto;
-    }
+    .bmi-card { width: 100%; max-width: 500px; text-align: center; }
+    .bmi-image { width: 100%; height: auto; display: block; margin: 0 auto; }
 
     .bmi-text {
       margin: 14px auto 0;
@@ -460,56 +430,90 @@
       font-weight: 700;
     }
 
-    .login-section {
-      min-height: 380px;
-      background: linear-gradient(90deg, #e8f5eb 0%, #e7f0ff 100%);
+    /* ----------------------------------------------------------- */
+    /* СТИЛИ СТРОГО ДЛЯ ВСПЛЫВАЮЩЕГО ОКНА (МОДАЛКИ) */
+    /* ----------------------------------------------------------- */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      background: rgba(31, 41, 77, 0.6); /* Затемнение фона */
+      backdrop-filter: blur(4px); /* Эффект размытия */
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 40px 20px;
-      scroll-margin-top: 120px;
-      margin-top: 24px;
-      border-top: 4px solid rgba(66, 87, 185, 0.2);
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    /* Когда у модалки есть класс .open — она становится видимой */
+    .modal-overlay.open {
+      opacity: 1;
+      pointer-events: auto;
     }
 
     .login-card {
       width: 100%;
       max-width: 440px;
-      background: rgba(255,255,255,0.9);
-      border: 2px solid rgba(87,114,204,0.35);
-      border-radius: 20px;
-      padding: 24px;
-      box-shadow: 0 12px 30px rgba(39, 58, 128, 0.08);
+      background: #ffffff;
+      border: 2px solid rgba(87,114,204,0.4);
+      border-radius: 24px;
+      padding: 30px 24px;
+      box-shadow: 0 20px 40px rgba(15, 24, 57, 0.25);
       text-align: center;
+      position: relative;
+      transform: translateY(-20px);
+      transition: transform 0.3s ease;
     }
 
-    .login-title {
-      margin: 0 0 15px;
-      font-size: 32px;
+    .modal-overlay.open .login-card {
+      transform: translateY(0);
+    }
+
+    /* Кнопка закрытия «Крестик» */
+    .modal-close-btn {
+      position: absolute;
+      top: 16px;
+      right: 20px;
+      background: none;
+      border: none;
+      font-size: 28px;
+      color: var(--muted);
+      cursor: pointer;
+      line-height: 1;
+      outline: none;
+      transition: color 0.2s;
+    }
+
+    .modal-close-btn:hover {
       color: var(--blue);
     }
 
+    .login-title { margin: 0 0 12px; font-size: 32px; color: var(--blue); }
+
     .login-text {
       font-family: Arial, Helvetica, sans-serif;
-      font-size: 16px;
+      font-size: 15px;
       line-height: 1.4;
       color: var(--text);
-      margin-bottom: 18px;
+      margin-bottom: 20px;
     }
 
-    .login-form {
-      display: grid;
-      gap: 12px;
-    }
+    .login-form { display: grid; gap: 12px; }
 
     .login-form input {
       width: 100%;
       height: 48px;
-      border: 2px solid rgba(87,114,204,0.4);
+      border: 2px solid rgba(87,114,204,0.3);
       border-radius: 12px;
       padding: 0 14px;
       font-size: 16px;
       outline: none;
+    }
+    .login-form input:focus {
+      border-color: var(--blue);
     }
 
     .login-form button {
@@ -520,6 +524,7 @@
       color: white;
       font-size: 18px;
       cursor: pointer;
+      font-weight: bold;
     }
 
     .toast {
@@ -539,17 +544,12 @@
       transition: 0.25s ease;
     }
 
-    .toast.show {
-      opacity: 1;
-      transform: translateY(0);
-    }
+    .toast.show { opacity: 1; transform: translateY(0); }
 
-    /* ----------------------------------------------------------- */
-    /* ГЛАВНАЯ МАГИЯ АДАПТИВА: МЕДИА-ЗАПРОСЫ ДЛЯ СМАРТФОНОВ (ЭКРАНЫ МЕНЬШЕ 900px) */
-    /* ----------------------------------------------------------- */
+    /* МЕДИА-ЗАПРОСЫ ДЛЯ МОБИЛЬНЫХ */
     @media (max-width: 900px) {
       .site-header {
-        flex-direction: column; /* Элементы шапки встают друг под друга */
+        flex-direction: column;
         align-items: center;
         text-align: center;
         gap: 15px;
@@ -559,23 +559,13 @@
       .brand-title { font-size: 36px; }
       .brand-subtitle { font-size: 14px; letter-spacing: 2px; }
 
-      .nav {
-        justify-content: center;
-        width: 100%;
-      }
-      
-      .nav-link, .login-button {
-        font-size: 14px;
-        padding: 8px 10px;
-      }
+      .nav { justify-content: center; width: 100%; }
+      .nav-link, .login-button { font-size: 14px; padding: 8px 10px; }
 
-      .section {
-        flex-direction: column; /* Левая и правая части таблиц идут в 1 колонку */
-        padding-top: 15px;
-      }
+      .section { flex-direction: column; padding-top: 15px; }
 
       .left-pane, .right-pane, .home-left, .home-right {
-        width: 100%; /* Занимают всю ширину экрана смартфона */
+        width: 100%;
         min-height: auto;
         padding: 15px;
         border: none;
@@ -584,25 +574,14 @@
       .home-title { font-size: 32px; }
       .home-text, .home-list { font-size: 16px; }
 
-      .donut {
-        width: 220px;
-        height: 220px;
-      }
+      .donut { width: 220px; height: 220px; }
       .donut::before { inset: 40px; }
       .donut-value { font-size: 36px; }
       
-      .data-toolbar {
-        flex-direction: column; /* Кнопки добавления встают вертикально */
-        align-items: stretch;
-      }
+      .data-toolbar { flex-direction: column; align-items: stretch; }
+      .data-toolbar input, .data-toolbar button { width: 100%; }
       
-      .data-toolbar input, .data-toolbar button {
-        width: 100%;
-      }
-      
-      .row-actions button {
-        width: 100%;
-      }
+      .row-actions button { width: 100%; }
     }
   </style>
 </head>
@@ -618,13 +597,13 @@
         <a class="nav-link" href="#training">Дневник<br>тренировок</a>
         <a class="nav-link" href="#nutrition">Дневник<br>питания</a>
         <a class="nav-link" href="#body">Оценка<br>тела</a>
-        <a class="login-button" href="#login">Вход</a>
+        <button type="button" class="login-button" id="headerAuthBtn">Вход</button>
       </nav>
     </header>
 
     <section class="section" id="home">
       <div class="left-pane home-left">
-        <img class="hero-image" src="парень(1).png" alt="Спортсмен с телефоном" />
+        <img class="hero-image" src="парень(1).png" alt="Спортсмен" />
       </div>
       <div class="right-pane home-right">
         <div class="home-content">
@@ -638,7 +617,7 @@
             <li>записывать приёмы пищи с визуальными коллажами</li>
             <li>контролировать изменения веса.</li>
           </ul>
-          <div class="home-text home-summary">
+          <div class="home-text">
             Все ключевые показатели собраны в одном месте, чтобы вы могли видеть свой прогресс, анализировать результаты и оставаться мотивированными каждый день.
           </div>
         </div>
@@ -665,7 +644,7 @@
             <button type="button" id="addTrainingBtn">Добавить строку</button>
             <button type="button" id="clearTrainingBtn">Очистить</button>
           </div>
-          <p class="hint">Можно добавлять строки, редактировать значения прямо в таблице и удалять последнюю строку.</p>
+          <p class="hint">Можно добавлять строки и редактировать значения прямо в таблице.</p>
           <div class="table-container">
             <table class="section-table" id="trainingTable">
               <thead>
@@ -725,7 +704,6 @@
             <button type="button" id="addNutritionBtn">Добавить строку</button>
             <button type="button" id="clearNutritionBtn">Очистить</button>
           </div>
-          <p class="hint">Нажми на дату в таблице — график слева покажет данные именно за этот день.</p>
           <div class="table-container">
             <table class="section-table" id="nutritionTable">
               <thead>
@@ -766,7 +744,6 @@
             <button type="button" id="addBodyBtn">Добавить строку</button>
             <button type="button" id="clearBodyBtn">Очистить</button>
           </div>
-          <p class="hint">Данные можно редактировать прямо в таблице.</p>
           <div class="table-container">
             <table class="section-table" id="bodyTable">
               <thead>
@@ -786,8 +763,9 @@
       </div>
     </section>
 
-    <section class="login-section" id="login">
+    <div class="modal-overlay" id="loginModal">
       <div class="login-card">
+        <button type="button" class="modal-close-btn" id="closeModalBtn">&times;</button>
         <h2 class="login-title">Вход / Регистрация</h2>
         <p class="login-text">Введите данные вашего аккаунта для синхронизации дневника через Firebase Realtime Database.</p>
         <form class="login-form">
@@ -796,7 +774,7 @@
           <button type="button" id="loginFakeBtn">Войти</button>
         </form>
       </div>
-    </section>
+    </div>
   </div>
 
   <div class="toast" id="toast"></div>
@@ -814,10 +792,9 @@
       storageBucket: "твой-проект.firebasestorage.app",
       messagingSenderId: "отправитель",
       appId: "айди-приложения",
-      databaseURL: "https://твой-проект-дефолт-ртдб.firebaseio.com" // Ссылка на твою Realtime Database
+      databaseURL: "https://твой-проект-дефолт-ртдб.firebaseio.com"
     };
 
-    // Инициализируем Firebase
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
     const auth = getAuth(app);
@@ -832,14 +809,36 @@
       selectedNutritionIndex: 0
     };
 
-    // Подвязываем селекторы элементов
     const trainingTableBody = document.querySelector('#trainingTable tbody');
     const nutritionTableBody = document.querySelector('#nutritionTable tbody');
     const bodyTableBody = document.querySelector('#bodyTable tbody');
     const loginBtn = document.getElementById('loginFakeBtn');
-    const headerAuthBtn = document.querySelector('.login-button');
+    const headerAuthBtn = document.getElementById('headerAuthBtn');
+    
+    // Элементы модального окна
+    const loginModal = document.getElementById('loginModal');
+    const closeModalBtn = document.getElementById('closeModalBtn');
 
-    // Настройка подсветки активных ссылок меню при скролле
+    // Логика открытия/закрытия всплывающего окна
+    function openModal() { loginModal.classList.add('open'); }
+    function closeModal() { loginModal.classList.remove('open'); }
+
+    closeModalBtn.addEventListener('click', closeModal);
+    // Закрытие при клике по затемненному фону вокруг карточки
+    loginModal.addEventListener('click', (e) => { if (e.target === loginModal) closeModal(); });
+
+    // Обработка клика на кнопку в Хедере (Вход / Выход)
+    headerAuthBtn.addEventListener('click', () => {
+      if (currentUser) {
+        // Если залогинен — кнопка работает на Выход
+        signOut(auth).then(() => showToast("Вы вышли из системы."));
+      } else {
+        // Если гость — открываем красивую всплывающую модалку
+        openModal();
+      }
+    });
+
+    // Настройка автоматической подсветки пунктов меню при скролле
     const links = document.querySelectorAll('.nav-link');
     const sections = document.querySelectorAll('#training, #nutrition, #body');
 
@@ -855,18 +854,16 @@
     }
     window.addEventListener('scroll', setActiveLink);
 
-    // Слушатель состояния авторизации пользователя
+    // Слушатель Firebase Auth
     onAuthStateChanged(auth, (user) => {
       currentUser = user;
       
       if (user) {
-        // Меняем кнопку Войти в шапке на статус активного профиля
+        closeModal(); // Закрываем окно после успешного входа
         headerAuthBtn.textContent = `Выйти (${user.email.split('@')[0]})`;
-        headerAuthBtn.href = "#";
         headerAuthBtn.style.background = "#ffcccc";
         headerAuthBtn.style.borderColor = "#ff9999";
         
-        // Слушаем ветку в Realtime Database конкретного юзера по UID
         const userDbRef = ref(db, `users/${user.uid}/fitData`);
         dbListenerRef = onValue(userDbRef, (snapshot) => {
           const data = snapshot.val();
@@ -875,28 +872,21 @@
             state.nutrition = data.nutrition || [];
             state.body = data.body || [];
           } else {
-            state.training = [];
-            state.nutrition = [];
-            state.body = [];
+            state.training = []; state.nutrition = []; state.body = [];
           }
           renderAll();
         });
       } else {
-        // Если гость
         headerAuthBtn.textContent = "Вход";
-        headerAuthBtn.href = "#login";
         headerAuthBtn.style.background = "#d6f1dc";
         headerAuthBtn.style.borderColor = "#6175ca";
         
-        state.training = [];
-        state.nutrition = [];
-        state.body = [];
+        state.training = []; state.nutrition = []; state.body = [];
         state.selectedNutritionIndex = 0;
         renderAll();
       }
     });
 
-    // Функция отправки обновлений в Realtime Database
     function syncWithFirebase() {
       if (!currentUser) return showToast("Войдите, чтобы сохранить изменения!");
       set(ref(db, `users/${currentUser.uid}/fitData`), {
@@ -906,17 +896,9 @@
       }).catch(err => showToast("Ошибка синхронизации: " + err.message));
     }
 
-    // Выход по клику на имя в хедере
-    headerAuthBtn.addEventListener('click', (e) => {
-      if (currentUser) {
-        e.preventDefault();
-        signOut(auth).then(() => showToast("Вы вышли из системы."));
-      }
-    });
-
-    // Умная форма Вход / Авто-регистрация
+    // Логика кнопки внутри модального окна
     loginBtn.addEventListener('click', () => {
-      const inputs = document.querySelectorAll('.login-form input');
+      const inputs = loginModal.querySelectorAll('.login-form input');
       const email = inputs[0].value.trim();
       const password = inputs[1].value;
 
@@ -925,15 +907,14 @@
       signInWithEmailAndPassword(auth, email, password)
         .then(() => {
           showToast("Успешный вход!");
-          document.querySelectorAll('.login-form input').forEach(i => i.value = '');
+          loginModal.querySelectorAll('.login-form input').forEach(i => i.value = '');
         })
         .catch((error) => {
-          // Если юзера нет в базе — регистрируем его на месте автоматикой
           if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
             createUserWithEmailAndPassword(auth, email, password)
               .then(() => {
                 showToast("Новый аккаунт успешно создан!");
-                document.querySelectorAll('.login-form input').forEach(i => i.value = '');
+                loginModal.querySelectorAll('.login-form input').forEach(i => i.value = '');
               })
               .catch(err => showToast("Ошибка создания аккаунта: " + err.message));
           } else {
@@ -942,7 +923,7 @@
         });
     });
 
-    // --- ФУНКЦИИ ОБРАБОТКИ ДАННЫХ И РЕНДЕРА ---
+    // --- ФУНКЦИИ ДАННЫХ И РЕНДЕРА ТАБЛИЦ ---
 
     function showToast(message) {
       const toast = document.getElementById('toast');
@@ -1072,7 +1053,7 @@
       });
     }
 
-    // КНОПКИ УПРАВЛЕНИЯ СТРОКАМИ
+    // ОБРАБОТЧИКИ КНОПОК ТАБЛИЦ
     document.getElementById('addTrainingBtn')?.addEventListener('click', () => {
       if (!currentUser) return showToast("Сначала войдите в аккаунт!");
       const name = document.getElementById('trainingNameInput').value.trim();

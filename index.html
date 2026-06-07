@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MyFitStats — Лендинг</title>
+  <title>MyFitStats — Дневник прогресса</title>
   <style>
     :root {
       --blue: #4257b9;
@@ -14,765 +14,294 @@
       --text: #3f4f79;
       --muted: #99a7bd;
     }
-
-    * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-
-    body {
-      margin: 0;
-      min-width: 320px; 
-      background: var(--bg);
-      color: var(--text);
-      font-family: Georgia, "Times New Roman", serif;
-    }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: Arial, sans-serif; padding-bottom: 60px; }
     a { color: inherit; text-decoration: none; }
-    .page { width: 100%; overflow-x: hidden; }
 
-    /* ХЕДЕР */
+    /* Хедер и Навигация */
     .site-header {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      min-height: 100px;
-      display: flex;
-      flex-direction: row;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      padding: 15px 20px;
-      background: linear-gradient(90deg, var(--mint) 0%, #b7d8e2 32%, var(--light-blue) 100%);
+      position: sticky; top: 0; z-index: 100; min-height: 100px; display: flex;
+      align-items: center; justify-content: space-between; padding: 15px 40px;
+      background: linear-gradient(90deg, var(--mint), #b7d8e2, var(--light-blue));
       border-bottom: 1px solid rgba(86, 109, 196, 0.15);
+      flex-wrap: wrap; gap: 15px;
     }
-
-    .brand { display: inline-block; }
-
-    .brand-title {
-      font-size: 42px;
-      line-height: 0.92;
-      font-weight: 700;
-      letter-spacing: -1px;
-      color: var(--blue);
-      text-shadow: 0 3px 0 rgba(56, 76, 158, 0.16);
+    .brand-title { font-size: 42px; font-weight: 700; color: var(--blue); font-family: Georgia, serif; }
+    .nav { display: flex; gap: 15px; align-items: center; flex-wrap: wrap; }
+    .nav-link, .login-button {
+      padding: 12px 20px; text-align: center; font-size: 18px; color: var(--blue);
+      border: 2px solid transparent; cursor: pointer; background: none; border-radius: 12px; transition: 0.2s;
     }
+    .nav-link.active { border-color: rgba(83, 109, 204, 0.55); background: rgba(255, 255, 255, 0.2); font-weight: bold; }
+    .login-button { border: 3px solid #6175ca; background: #d6f1dc; font-weight: bold; }
+    .nav-link:hover, .login-button:hover { transform: translateY(-1px); opacity: 0.9; }
 
-    .brand-subtitle {
-      margin-top: 8px;
-      margin-left: 2px;
-      font-family: Arial, Helvetica, sans-serif;
-      font-size: 16px;
-      font-weight: 300;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      color: var(--muted);
-    }
+    /* Вкладки (Табы) */
+    .tab-content { display: none; max-width: 1100px; margin: 40px auto; padding: 20px; }
+    .tab-content.active { display: grid; grid-template-columns: 45% 55%; gap: 40px; align-items: center; }
+    #auth-tab.active { display: block; max-width: 450px; }
+    
+    .pane-left { text-align: center; width: 100%; }
+    .hero-image { width: 100%; max-width: 500px; height: auto; }
+    
+    .home-content h1 { font-size: 48px; color: var(--blue); margin-bottom: 20px; font-family: Georgia, serif; }
+    .home-text { font-size: 20px; line-height: 1.5; margin-bottom: 20px; }
 
-    .nav {
-      display: flex;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
+    /* Карточки категорий на Главной */
+    .stats-features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 30px; }
+    .feature-card { background: #fff; padding: 20px; border-radius: 16px; border: 2px solid rgba(87,114,204,0.15); cursor: pointer; transition: 0.2s; }
+    .feature-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.05); }
+    .feature-card h3 { color: var(--blue); margin-bottom: 8px; }
 
-    .nav-link,
-    .login-button {
-      min-width: auto;
-      padding: 10px 12px;
-      text-align: center;
-      font-family: Arial, Helvetica, sans-serif;
-      font-size: 16px;
-      line-height: 1.2;
-      color: var(--blue);
-      border: 2px solid transparent;
-      transition: 0.2s ease;
-      cursor: pointer;
-    }
+    /* Модальные окна */
+    .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.25s ease; padding: 10px; }
+    .modal.show { display: flex; opacity: 1; }
+    .modal-box { background: var(--bg); width: 90%; max-width: 1050px; max-height: 85vh; overflow-y: auto; border-radius: 24px; padding: 30px; position: relative; display: grid; grid-template-columns: 42% 58%; gap: 30px; }
+    .close-modal { position: absolute; top: 15px; right: 20px; font-size: 30px; cursor: pointer; color: var(--muted); z-index: 10; }
 
-    .nav-link:hover,
-    .login-button:hover {
-      opacity: 0.92;
-      transform: translateY(-1px);
-    }
+    /* Компоненты форм */
+    .toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
+    .toolbar input, .toolbar select, .auth-form input { height: 42px; padding: 0 14px; border: 2px solid rgba(87,114,204,0.3); border-radius: 10px; outline: none; font-size: 14px; background: #fff; }
+    .toolbar input, .toolbar select { width: auto; flex-grow: 1; min-width: 70px; }
+    .toolbar button, .row-actions button, .auth-form button { height: 42px; padding: 0 16px; border: none; border-radius: 10px; background: var(--blue); color: #fff; cursor: pointer; font-size: 15px; font-weight: bold; }
+    .row-actions button { background: #7e91df; margin-top: 10px; width: 100%; }
+    .hint { font-size: 13px; color: #5f6d91; margin-bottom: 10px; }
 
-    .nav-link.active {
-      border-color: rgba(83, 109, 204, 0.55);
-      background: rgba(255, 255, 255, 0.12);
-      border-radius: 10px;
-    }
+    /* Обертка для таблиц (адаптивный скролл) */
+    .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 10px; border-radius: 8px; border: 1px solid rgba(87,114,204,0.3); }
+    .section-table { width: 100%; border-collapse: collapse; font-size: 16px; background: #fff; overflow: hidden; }
+    .section-table th, .section-table td { border: 1px solid rgba(87,114,204,0.3); padding: 12px; text-align: center; white-space: nowrap; }
+    .section-table th { font-family: Georgia, serif; font-weight: bold; background: #e6ecf7; }
+    .editable-cell { outline: none; min-height: 20px; min-width: 50px; }
+    .date-pill { padding: 4px 12px; border-radius: 12px; background: #e1e1e1; border: none; cursor: pointer; }
+    .date-pill.active { background: #cfd9ff; font-weight: bold; }
 
-    .login-button {
-      border: 2px solid #6175ca;
-      border-radius: 12px;
-      background: #d6f1dc;
-      padding: 10px 18px;
-    }
+    /* Графики */
+    .donut { width: 200px; height: 200px; margin: 0 auto 15px; border-radius: 50%; position: relative; background: conic-gradient(var(--blue-dark) 0deg, #d5d5d5 0deg); display: flex; align-items: center; justify-content: center; }
+    .donut::before { content: ""; position: absolute; inset: 40px; background: var(--bg); border-radius: 50%; }
+    .donut-value { position: relative; font-size: 36px; font-weight: bold; color: #111; z-index: 2; }
 
-    /* СЕКЦИИ */
-    .section {
-      min-height: calc(100vh - 120px);
-      scroll-margin-top: 120px;
-      display: flex;
-      flex-direction: row;
-      background: var(--bg);
-      margin-top: 24px;
-      padding-top: 24px;
-      border-top: 4px solid rgba(66, 87, 185, 0.2);
-    }
+    .chart-area { position: relative; height: 220px; padding: 20px 10px 40px 40px; background: #fff; border-radius: 12px; border: 1px solid #ddd; margin-bottom: 20px; width: 100%; }
+    .grid-line { position: absolute; left: 40px; right: 10px; height: 1px; background: #eee; }
+    .grid-line span { position: absolute; left: -35px; top: -8px; font-size: 11px; }
+    
+    .bars { position: absolute; left: 50px; right: 10px; bottom: 40px; top: 20px; display: flex; align-items: flex-end; gap: 10px; }
+    .bar-group { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; }
+    .bar { width: 100%; border-radius: 6px 6px 0 0; transition: height 0.25s; min-height: 2px; }
+    
+    .bar.breakfast { background: #a9d5b3; } .bar.lunch { background: #a8cbd9; } .bar.dinner { background: #91aee8; }
+    .bar.workout-day { background: #6175ca; }
+    
+    .bar-label { margin-top: 6px; font-size: 11px; white-space: nowrap; }
+    .bar-value { margin-bottom: 4px; font-size: 11px; font-weight: bold; color: var(--blue-dark); }
 
-    .left-pane,
-    .right-pane {
-      width: 50%;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-    }
+    .bmi-display { background: #fff; padding: 20px; border-radius: 16px; border: 2px solid rgba(87,114,204,0.15); margin-top: 15px; text-align: center; }
+    .bmi-value { font-size: 36px; font-weight: bold; color: var(--blue-dark); margin: 5px 0; }
+    .bmi-status { font-size: 16px; font-weight: bold; color: #5f6d91; }
 
-    .home-left { background: #f3f3f3; border-right: 1px solid #ececec; width: 44%; }
-    .home-right { background: #f6f6f6; width: 56%; }
-
-    .hero-image {
-      width: 100%;
-      max-width: 500px;
-      height: auto;
-      display: block;
-    }
-
-    .home-content {
-      max-width: 650px;
-      width: 100%;
-    }
-
-    .home-title {
-      margin: 0;
-      text-align: center;
-      font-size: 42px;
-      line-height: 1;
-      color: var(--blue);
-      text-shadow: 0 3px 0 rgba(56, 76, 158, 0.14);
-    }
-
-    .home-text,
-    .home-list {
-      font-size: 18px;
-      line-height: 1.4;
-      letter-spacing: 1px;
-      font-weight: 700;
-      color: var(--text);
-    }
-
-    .home-text { margin-top: 20px; }
-
-    .home-subtitle {
-      margin-top: 24px;
-      text-align: center;
-      font-size: 20px;
-      line-height: 1.2;
-      color: var(--blue);
-      text-transform: uppercase;
-      letter-spacing: 2px;
-    }
-
-    .home-list { margin: 14px 0 0; padding-left: 20px; }
-    .home-list li { margin-bottom: 12px; }
-
-    .panel-wrap { width: 100%; max-width: 400px; }
-    .donut-card { width: 100%; text-align: center; }
-
-    .donut {
-      width: 280px;
-      height: 280px;
-      margin: 0 auto;
-      border-radius: 50%;
-      background: conic-gradient(var(--blue-dark) 0deg 0deg, #d5d5d5 0deg 360deg);
-      position: relative;
-    }
-
-    .donut::before {
-      content: "";
-      position: absolute;
-      inset: 50px;
-      background: var(--bg);
-      border-radius: 50%;
-    }
-
-    .donut-value {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 46px;
-      color: #111;
-      z-index: 2;
-    }
-
-    .panel-caption {
-      margin-top: 15px;
-      font-family: Arial, Helvetica, sans-serif;
-      font-size: 24px;
-      color: var(--blue);
-    }
-
-    .right-pane-stack {
-      width: 100%;
-      max-width: 100%;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .data-toolbar {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
-      margin-bottom: 14px;
-      font-family: Arial, Helvetica, sans-serif;
-    }
-
-    .data-toolbar input {
-      height: 42px;
-      flex: 1 1 140px;
-      padding: 0 12px;
-      border: 2px solid rgba(87, 114, 204, 0.45);
-      border-radius: 12px;
-      outline: none;
-      font-size: 15px;
-      background: rgba(255,255,255,0.82);
-    }
-
-    .data-toolbar button,
-    .row-actions button {
-      height: 42px;
-      padding: 0 16px;
-      border: none;
-      border-radius: 12px;
-      background: var(--blue);
-      color: #fff;
-      font-size: 15px;
-      cursor: pointer;
-    }
-
-    .hint {
-      margin: 0 0 10px;
-      font-family: Arial, Helvetica, sans-serif;
-      font-size: 14px;
-      color: #5f6d91;
-    }
-
-    .table-container {
-      width: 100%;
-      overflow-x: auto;
-      border: 2px solid rgba(87, 114, 204, 0.68);
-      border-radius: 8px;
-      background: transparent;
-    }
-
-    .section-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-family: Arial, Helvetica, sans-serif;
-      color: #222;
-      font-size: 16px;
-    }
-
-    .section-table th,
-    .section-table td {
-      border: 1px solid rgba(87, 114, 204, 0.4);
-      height: 50px;
-      text-align: center;
-      vertical-align: middle;
-      padding: 6px 8px;
-      white-space: nowrap;
-    }
-
-    .section-table th {
-      font-family: Georgia, "Times New Roman", serif;
-      font-size: 16px;
-      color: #111;
-      font-weight: 700;
-    }
-
-    .th-blue { background: #90aee7 !important; }
-    .th-cyan { background: #a6cad9 !important; }
-    .th-green { background: #b7e0bf !important; }
-    .th-gray { background: #9aaaba !important; }
-
-    .date-pill {
-      display: inline-block;
-      padding: 4px 12px;
-      border-radius: 999px;
-      background: #e1e1e1;
-      line-height: 1;
-      cursor: pointer;
-      border: none;
-      font-size: inherit;
-    }
-
-    .date-pill.active {
-      background: #cfd9ff;
-      box-shadow: inset 0 0 0 2px rgba(66,87,185,0.25);
-    }
-
-    .editable-cell {
-      min-height: 24px;
-      outline: none;
-      cursor: text;
-    }
-
-    .editable-cell:focus {
-      background: rgba(207, 217, 255, 0.35);
-      border-radius: 6px;
-    }
-
-    .row-actions {
-      display: flex;
-      gap: 8px;
-      margin-top: 10px;
-      font-family: Arial, Helvetica, sans-serif;
-    }
-
-    .row-actions button {
-      height: 38px;
-      background: #7e91df;
-      font-size: 14px;
-    }
-
-    .bars-card { width: 100%; max-width: 450px; }
-
-    .chart-area {
-      position: relative;
-      height: 320px;
-      padding: 20px 10px 40px 45px;
-    }
-
-    .grid-line {
-      position: absolute;
-      left: 45px;
-      right: 10px;
-      height: 1px;
-      background: #cfcfcf;
-    }
-
-    .grid-line span {
-      position: absolute;
-      left: -35px;
-      top: -10px;
-      font-family: Arial, Helvetica, sans-serif;
-      font-size: 14px;
-      color: #111;
-    }
-
-    .bars {
-      position: absolute;
-      left: 60px;
-      right: 15px;
-      bottom: 40px;
-      top: 20px;
-      display: flex;
-      align-items: flex-end;
-      gap: 15px;
-    }
-
-    .bar-group {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-end;
-      height: 100%;
-    }
-
-    .bar {
-      width: 100%;
-      max-width: 60px;
-      border-radius: 12px 12px 0 0;
-      transition: height 0.25s ease;
-      min-height: 2px;
-    }
-
-    .bar.breakfast { background: #a9d5b3; }
-    .bar.lunch { background: #a8cbd9; }
-    .bar.dinner { background: #91aee8; }
-
-    .bar-label {
-      margin-top: 8px;
-      font-family: Georgia, "Times New Roman", serif;
-      font-size: 15px;
-      color: #111;
-    }
-
-    .bar-value {
-      margin-bottom: 4px;
-      font-family: Arial, Helvetica, sans-serif;
-      font-size: 14px;
-      color: #374b9f;
-      min-height: 20px;
-    }
-
-    .nutrition-selected {
-      margin-top: 8px;
-      font-family: Arial, Helvetica, sans-serif;
-      font-size: 14px;
-      color: #5e6c93;
-      text-align: center;
-    }
-
-    .bmi-card { width: 100%; max-width: 500px; text-align: center; }
-    .bmi-image { width: 100%; height: auto; display: block; margin: 0 auto; }
-
-    .bmi-text {
-      margin: 14px auto 0;
-      font-size: 14px;
-      line-height: 1.4;
-      color: #42507a;
-      font-weight: 700;
-    }
-
-    /* ----------------------------------------------------------- */
-    /* СТИЛИ СТРОГО ДЛЯ ВСПЛЫВАЮЩЕГО ОКНА (МОДАЛКИ) */
-    /* ----------------------------------------------------------- */
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 200;
-      background: rgba(31, 41, 77, 0.6); /* Затемнение фона */
-      backdrop-filter: blur(4px); /* Эффект размытия */
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s ease;
-    }
-
-    /* Когда у модалки есть класс .open — она становится видимой */
-    .modal-overlay.open {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    .login-card {
-      width: 100%;
-      max-width: 440px;
-      background: #ffffff;
-      border: 2px solid rgba(87,114,204,0.4);
-      border-radius: 24px;
-      padding: 30px 24px;
-      box-shadow: 0 20px 40px rgba(15, 24, 57, 0.25);
-      text-align: center;
-      position: relative;
-      transform: translateY(-20px);
-      transition: transform 0.3s ease;
-    }
-
-    .modal-overlay.open .login-card {
-      transform: translateY(0);
-    }
-
-    /* Кнопка закрытия «Крестик» */
-    .modal-close-btn {
-      position: absolute;
-      top: 16px;
-      right: 20px;
-      background: none;
-      border: none;
-      font-size: 28px;
-      color: var(--muted);
-      cursor: pointer;
-      line-height: 1;
-      outline: none;
-      transition: color 0.2s;
-    }
-
-    .modal-close-btn:hover {
-      color: var(--blue);
-    }
-
-    .login-title { margin: 0 0 12px; font-size: 32px; color: var(--blue); }
-
-    .login-text {
-      font-family: Arial, Helvetica, sans-serif;
-      font-size: 15px;
-      line-height: 1.4;
-      color: var(--text);
-      margin-bottom: 20px;
-    }
-
-    .login-form { display: grid; gap: 12px; }
-
-    .login-form input {
-      width: 100%;
-      height: 48px;
-      border: 2px solid rgba(87,114,204,0.3);
-      border-radius: 12px;
-      padding: 0 14px;
-      font-size: 16px;
-      outline: none;
-    }
-    .login-form input:focus {
-      border-color: var(--blue);
-    }
-
-    .login-form button {
-      height: 50px;
-      border: none;
-      border-radius: 14px;
-      background: var(--blue);
-      color: white;
-      font-size: 18px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-
-    .toast {
-      position: fixed;
-      right: 20px;
-      bottom: 20px;
-      z-index: 300;
-      background: rgba(55, 75, 159, 0.96);
-      color: white;
-      padding: 12px 16px;
-      border-radius: 12px;
-      font-family: Arial, Helvetica, sans-serif;
-      font-size: 14px;
-      opacity: 0;
-      transform: translateY(10px);
-      pointer-events: none;
-      transition: 0.25s ease;
-    }
-
+    /* Авторизация */
+    .auth-card { background: #fff; border-radius: 24px; padding: 35px; border: 2px solid rgba(87,114,204,0.15); box-shadow: 0 10px 25px rgba(0,0,0,0.03); }
+    .auth-card h2 { margin-bottom: 20px; color: var(--blue); font-family: Georgia, serif; text-align: center; }
+    .auth-form { display: grid; gap: 14px; }
+    .auth-toggle { margin-top: 20px; text-align: center; font-size: 14px; color: var(--blue); cursor: pointer; text-decoration: underline; }
+    
+    .toast { position: fixed; right: 20px; bottom: 20px; z-index: 300; background: rgba(55, 75, 159, 0.95); color: white; padding: 12px 20px; border-radius: 10px; font-size: 14px; opacity: 0; transform: translateY(10px); pointer-events: none; transition: 0.25s; }
     .toast.show { opacity: 1; transform: translateY(0); }
 
-    /* МЕДИА-ЗАПРОСЫ ДЛЯ МОБИЛЬНЫХ */
-    @media (max-width: 900px) {
-      .site-header {
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-        gap: 15px;
-        padding: 15px 10px;
-      }
-      
-      .brand-title { font-size: 36px; }
-      .brand-subtitle { font-size: 14px; letter-spacing: 2px; }
-
+    /* ==========================================================================
+       Адаптивные стили (Медиа-запросы для мобильных устройств)
+       ========================================================================== */
+    @media (max-width: 992px) {
+      .site-header { padding: 15px 20px; justify-content: center; text-align: center; }
+      .brand-title { font-size: 34px; width: 100%; }
       .nav { justify-content: center; width: 100%; }
-      .nav-link, .login-button { font-size: 14px; padding: 8px 10px; }
+      .nav-link, .login-button { padding: 10px 15px; font-size: 16px; }
 
-      .section { flex-direction: column; padding-top: 15px; }
+      .tab-content.active { grid-template-columns: 1fr; gap: 20px; margin: 20px auto; }
+      .home-content h1 { font-size: 36px; text-align: center; }
+      .home-text { font-size: 18px; text-align: center; }
+      .stats-features { grid-template-columns: 1fr; gap: 15px; }
 
-      .left-pane, .right-pane, .home-left, .home-right {
-        width: 100%;
-        min-height: auto;
-        padding: 15px;
-        border: none;
-      }
-      
-      .home-title { font-size: 32px; }
-      .home-text, .home-list { font-size: 16px; }
+      .modal-box { grid-template-columns: 1fr; gap: 20px; padding: 25px 15px 15px; width: 100%; max-height: 95vh; }
+      .close-modal { top: 5px; right: 10px; }
+    }
 
-      .donut { width: 220px; height: 220px; }
-      .donut::before { inset: 40px; }
-      .donut-value { font-size: 36px; }
-      
-      .data-toolbar { flex-direction: column; align-items: stretch; }
-      .data-toolbar input, .data-toolbar button { width: 100%; }
-      
-      .row-actions button { width: 100%; }
+    @media (max-width: 480px) {
+      .brand-title { font-size: 28px; }
+      .nav-link, .login-button { font-size: 14px; padding: 8px 12px; width: 100%; }
+      .toolbar { flex-direction: column; }
+      .toolbar input, .toolbar select, .toolbar button { width: 100% !important; }
     }
   </style>
 </head>
 <body>
-  <div class="page">
-    <header class="site-header">
-      <a class="brand" href="#home">
-        <div class="brand-title">MyFitStats</div>
-        <div class="brand-subtitle">Дневник прогресса</div>
-      </a>
 
-      <nav class="nav">
-        <a class="nav-link" href="#training">Дневник<br>тренировок</a>
-        <a class="nav-link" href="#nutrition">Дневник<br>питания</a>
-        <a class="nav-link" href="#body">Оценка<br>тела</a>
-        <button type="button" class="login-button" id="headerAuthBtn">Вход</button>
-      </nav>
-    </header>
+  <header class="site-header">
+    <a class="brand" href="#" onclick="switchTab('home')">
+      <div class="brand-title">MyFitStats</div>
+    </a>
+    <nav class="nav">
+      <button class="nav-link" onclick="openModal('trainingModal')">Дневник тренировок</button>
+      <button class="nav-link" onclick="openModal('nutritionModal')">Дневник питания</button>
+      <button class="nav-link" onclick="openModal('bodyModal')">Оценка тела</button>
+      <button class="login-button" id="headerAuthBtn" onclick="handleHeaderAuthClick()">Вход / Регистрация</button>
+    </nav>
+  </header>
 
-    <section class="section" id="home">
-      <div class="left-pane home-left">
-        <img class="hero-image" src="парень(1).png" alt="Спортсмен" />
-      </div>
-      <div class="right-pane home-right">
-        <div class="home-content">
-          <h1 class="home-title">MyFitStats</h1>
-          <div class="home-text">
-            Это удобный и наглядный дневник, который помогает отслеживать ваш путь к здоровому образу жизни.
-          </div>
-          <div class="home-subtitle">Здесь вы можете:</div>
-          <ul class="home-list">
-            <li>фиксировать физическую активность,</li>
-            <li>записывать приёмы пищи с визуальными коллажами</li>
-            <li>контролировать изменения веса.</li>
-          </ul>
-          <div class="home-text">
-            Все ключевые показатели собраны в одном месте, чтобы вы могли видеть свой прогресс, анализировать результаты и оставаться мотивированными каждый день.
-          </div>
+  <section class="tab-content active" id="home">
+    <div class="pane-left">
+      <img class="hero-image" src="парень(1).png" alt="Спортсмен" />
+    </div>
+    <div class="home-content">
+      <h1>MyFitStats</h1>
+      <p class="home-text">Удобный интерактивный дневник для контроля ключевых показателей здоровья и физической активности в одном месте.</p>
+      <div class="stats-features">
+        <div class="feature-card" onclick="openModal('trainingModal')">
+          <h3>🏃‍♂️ Тренировки</h3>
+          <p>Фиксация активности, выбор шагов/км и недельные графики.</p>
+        </div>
+        <div class="feature-card" onclick="openModal('nutritionModal')">
+          <h3>🍏 Питание</h3>
+          <p>Контроль калорийности приёмов пищи с графиками.</p>
+        </div>
+        <div class="feature-card" onclick="openModal('bodyModal')">
+          <h3>⚖️ Замеры тела</h3>
+          <p>Мониторинг изменений веса, роста и калькулятор ИМТ.</p>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <section class="section" id="training">
-      <div class="left-pane">
-        <div class="panel-wrap">
-          <div class="donut-card">
-            <div class="donut" id="trainingDonut">
-              <div class="donut-value" id="trainingPercent">0 %</div>
-            </div>
-            <div class="panel-caption">Прогресс недели</div>
-          </div>
-        </div>
-      </div>
-      <div class="right-pane">
-        <div class="right-pane-stack">
-          <div class="data-toolbar">
-            <input id="trainingNameInput" type="text" placeholder="Тренировка" />
-            <input id="trainingValueInput" type="text" placeholder="Шаги или км" />
-            <input id="trainingDateInput" type="date" />
-            <button type="button" id="addTrainingBtn">Добавить строку</button>
-            <button type="button" id="clearTrainingBtn">Очистить</button>
-          </div>
-          <p class="hint">Можно добавлять строки и редактировать значения прямо в таблице.</p>
-          <div class="table-container">
-            <table class="section-table" id="trainingTable">
-              <thead>
-                <tr>
-                  <th class="th-blue">Тренировка</th>
-                  <th class="th-cyan">Шаги / Км</th>
-                  <th class="th-green">Дата</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-          </div>
-          <div class="row-actions">
-            <button type="button" id="removeTrainingBtn">Удалить последнюю строку</button>
-          </div>
-        </div>
-      </div>
-    </section>
+  <section class="tab-content" id="auth-tab">
+    <div class="auth-card" id="login-block">
+      <h2>Вход в систему</h2>
+      <form class="auth-form" id="loginForm">
+        <input type="email" id="loginEmail" placeholder="Ваш Email" required />
+        <input type="password" id="loginPass" placeholder="Пароль" required />
+        <button type="submit">Войти</button>
+      </form>
+      <div class="auth-toggle" onclick="toggleAuthForms(false)">Нет аккаунта? Зарегистрироваться</div>
+    </div>
 
-    <section class="section" id="nutrition">
-      <div class="left-pane">
-        <div class="bars-card">
-          <div class="chart-area">
-            <div class="grid-line" style="top: 40px;"><span>900</span></div>
-            <div class="grid-line" style="top: 100px;"><span>700</span></div>
-            <div class="grid-line" style="top: 160px;"><span>500</span></div>
-            <div class="grid-line" style="top: 220px;"><span>300</span></div>
-            <div class="grid-line" style="top: 280px;"><span>100</span></div>
-            <div class="bars">
-              <div class="bar-group">
-                <div class="bar-value" id="breakfastValue">0</div>
-                <div class="bar breakfast" id="breakfastBar" style="height: 2px;"></div>
-                <div class="bar-label">Завтрак</div>
-              </div>
-              <div class="bar-group">
-                <div class="bar-value" id="lunchValue">0</div>
-                <div class="bar lunch" id="lunchBar" style="height: 2px;"></div>
-                <div class="bar-label">Обед</div>
-              </div>
-              <div class="bar-group">
-                <div class="bar-value" id="dinnerValue">0</div>
-                <div class="bar dinner" id="dinnerBar" style="height: 2px;"></div>
-                <div class="bar-label">Ужин</div>
-              </div>
-            </div>
-          </div>
-          <div class="nutrition-selected" id="nutritionSelectedDate">Выберите дату в таблице справа</div>
-        </div>
-      </div>
-      <div class="right-pane">
-        <div class="right-pane-stack">
-          <div class="data-toolbar">
-            <input id="breakfastInput" type="number" min="0" placeholder="Завтрак / Ккал" />
-            <input id="lunchInput" type="number" min="0" placeholder="Обед / Ккал" />
-            <input id="dinnerInput" type="number" min="0" placeholder="Ужин / Ккал" />
-            <input id="nutritionDateInput" type="date" />
-            <button type="button" id="addNutritionBtn">Добавить строку</button>
-            <button type="button" id="clearNutritionBtn">Очистить</button>
-          </div>
-          <div class="table-container">
-            <table class="section-table" id="nutritionTable">
-              <thead>
-                <tr>
-                  <th class="th-green">Завтрак / Ккал</th>
-                  <th class="th-cyan">Обед / Ккал</th>
-                  <th class="th-blue">Ужин / Ккал</th>
-                  <th class="th-gray">Дата</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-          </div>
-          <div class="row-actions">
-            <button type="button" id="removeNutritionBtn">Удалить последнюю строку</button>
-          </div>
-        </div>
-      </div>
-    </section>
+    <div class="auth-card" id="register-block" style="display: none;">
+      <h2>Регистрация</h2>
+      <form class="auth-form" id="registerForm">
+        <input type="text" id="regName" placeholder="Ваше имя" required />
+        <input type="email" id="regEmail" placeholder="Укажите Email" required />
+        <input type="password" id="regPass" placeholder="Придумайте пароль (от 6 символов)" required />
+        <input type="password" id="regPassConfirm" placeholder="Повторите пароль" required />
+        <button type="submit">Создать аккаунт</button>
+      </form>
+      <div class="auth-toggle" onclick="toggleAuthForms(true)">Уже есть аккаунт? Войти</div>
+    </div>
+  </section>
 
-    <section class="section" id="body">
-      <div class="left-pane">
-        <div class="bmi-card">
-          <img class="bmi-image" src="график(1).png" alt="Индекс массы тела" />
-          <div class="bmi-text">
-            Индекс массы тела (ИМТ) рассчитывается по формуле:<br>
-            ИМТ = вес (кг) / (рост (м))².<br><br>
-            Это соотношение массы тела к росту, используемое для оценки соответствия веса и роста.
+  <div class="modal" id="trainingModal" onclick="closeModalOnBackdrop(event)">
+    <div class="modal-box">
+      <span class="close-modal" onclick="closeModal('trainingModal')">&times;</span>
+      <div class="pane-left">
+        <div class="donut" id="trainingDonut"><div class="donut-value" id="trainingPercent">0%</div></div>
+        <h4 style="margin-bottom: 15px;">Цель недели: 32 000 шагов</h4>
+        
+        <div class="chart-area" style="height: 180px;">
+          <div class="grid-line" style="top:30px;"><span>8к</span></div>
+          <div class="grid-line" style="top:80px;"><span>4к</span></div>
+          <div class="bars" style="bottom: 30px;">
+            <div class="bar-group"><div class="bar-value" id="wd-1">0</div><div class="bar workout-day" id="wb-1"></div><div class="bar-label">Пн</div></div>
+            <div class="bar-group"><div class="bar-value" id="wd-2">0</div><div class="bar workout-day" id="wb-2"></div><div class="bar-label">Вт</div></div>
+            <div class="bar-group"><div class="bar-value" id="wd-3">0</div><div class="bar workout-day" id="wb-3"></div><div class="bar-label">Ср</div></div>
+            <div class="bar-group"><div class="bar-value" id="wd-4">0</div><div class="bar workout-day" id="wb-4"></div><div class="bar-label">Чт</div></div>
+            <div class="bar-group"><div class="bar-value" id="wd-5">0</div><div class="bar workout-day" id="wb-5"></div><div class="bar-label">Пт</div></div>
+            <div class="bar-group"><div class="bar-value" id="wd-6">0</div><div class="bar workout-day" id="wb-6"></div><div class="bar-label">Сб</div></div>
+            <div class="bar-group"><div class="bar-value" id="wd-7">0</div><div class="bar workout-day" id="wb-7"></div><div class="bar-label">Вс</div></div>
           </div>
         </div>
       </div>
-      <div class="right-pane">
-        <div class="right-pane-stack">
-          <div class="data-toolbar">
-            <input id="currentWeightInput" type="number" min="0" step="0.1" placeholder="Ваш вес / кг" />
-            <input id="targetWeightInput" type="number" min="0" step="0.1" placeholder="Желаемый вес / кг" />
-            <input id="bodyDateInput" type="date" />
-            <button type="button" id="addBodyBtn">Добавить строку</button>
-            <button type="button" id="clearBodyBtn">Очистить</button>
-          </div>
-          <div class="table-container">
-            <table class="section-table" id="bodyTable">
-              <thead>
-                <tr>
-                  <th class="th-blue">Ваш вес / кг</th>
-                  <th class="th-cyan">Желаемый вес / кг</th>
-                  <th class="th-green">Дата</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-          </div>
-          <div class="row-actions">
-            <button type="button" id="removeBodyBtn">Удалить последнюю строку</button>
-          </div>
+      <div id="trainingContentBox">
+        <div class="toolbar">
+          <input id="trainingNameInput" type="text" placeholder="Упражнение" style="width:140px;" />
+          <input id="trainingValueInput" type="number" placeholder="Кол-во" style="width:80px;" />
+          <select id="trainingUnitInput">
+            <option value="шаги">шаги</option>
+            <option value="км">км</option>
+          </select>
+          <input id="trainingDateInput" type="date" />
+          <button onclick="addTraining()">+</button>
+          <button onclick="clearData('training')">Очистить</button>
         </div>
+        <div class="table-responsive">
+          <table class="section-table" id="trainingTable">
+            <thead><tr><th>Активность</th><th>Результат</th><th>Ед. изм.</th><th>Дата</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="row-actions"><button onclick="removeLast('training')">Удалить последнюю строку</button></div>
       </div>
-    </section>
+    </div>
+  </div>
 
-    <div class="modal-overlay" id="loginModal">
-      <div class="login-card">
-        <button type="button" class="modal-close-btn" id="closeModalBtn">&times;</button>
-        <h2 class="login-title">Вход / Регистрация</h2>
-        <p class="login-text">Введите данные вашего аккаунта для синхронизации дневника через Firebase Realtime Database.</p>
-        <form class="login-form">
-          <input type="email" placeholder="Email (Логин)" required />
-          <input type="password" placeholder="Пароль" required />
-          <button type="button" id="loginFakeBtn">Войти</button>
-        </form>
+  <div class="modal" id="nutritionModal" onclick="closeModalOnBackdrop(event)">
+    <div class="modal-box">
+      <span class="close-modal" onclick="closeModal('nutritionModal')">&times;</span>
+      <div class="pane-left">
+        <div class="chart-area">
+          <div class="grid-line" style="top:40px;"><span>900</span></div>
+          <div class="grid-line" style="top:100px;"><span>600</span></div>
+          <div class="grid-line" style="top:160px;"><span>300</span></div>
+          <div class="bars">
+            <div class="bar-group"><div class="bar-value" id="breakfastValue">0</div><div class="bar breakfast" id="breakfastBar"></div><div class="bar-label">Завтрак</div></div>
+            <div class="bar-group"><div class="bar-value" id="lunchValue">0</div><div class="bar lunch" id="lunchBar"></div><div class="bar-label">Обед</div></div>
+            <div class="bar-group"><div class="bar-value" id="dinnerValue">0</div><div class="bar dinner" id="dinnerBar"></div><div class="bar-label">Ужин</div></div>
+          </div>
+        </div>
+        <p class="hint" id="nutritionSelectedDate" style="margin-top:10px; font-weight:bold;"></p>
+      </div>
+      <div id="nutritionContentBox">
+        <div class="toolbar">
+          <input id="breakfastInput" type="number" placeholder="Завтрак" style="width:75px;" />
+          <input id="lunchInput" type="number" placeholder="Обед" style="width:75px;" />
+          <input id="dinnerInput" type="number" placeholder="Ужин" style="width:75px;" />
+          <input id="nutritionDateInput" type="date" />
+          <button onclick="addNutrition()">+</button>
+          <button onclick="clearData('nutrition')">Очистить</button>
+        </div>
+        <div class="table-responsive">
+          <table class="section-table" id="nutritionTable">
+            <thead><tr><th>Завтрак</th><th>Обед</th><th>Ужин</th><th>Дата</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="row-actions"><button onclick="removeLast('nutrition')">Удалить последнюю строку</button></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="bodyModal" onclick="closeModalOnBackdrop(event)">
+    <div class="modal-box">
+      <span class="close-modal" onclick="closeModal('bodyModal')">&times;</span>
+      <div class="pane-left">
+        <div class="bmi-display">
+          <h4>Ваш Индекс Массы Тела</h4>
+          <div class="bmi-value" id="bmiValue">--.-</div>
+          <div class="bmi-status" id="bmiStatus">Нет данных</div>
+        </div>
+      </div>
+      <div id="bodyContentBox">
+        <div class="toolbar">
+          <input id="currentWeightInput" type="number" step="0.1" placeholder="Вес (кг)" style="width:85px;" />
+          <input id="currentHeightInput" type="number" step="1" placeholder="Рост (см)" style="width:85px;" />
+          <input id="targetWeightInput" type="number" step="0.1" placeholder="Цель (кг)" style="width:85px;" />
+          <input id="bodyDateInput" type="date" />
+          <button onclick="addBody()">+</button>
+          <button onclick="clearData('body')">Очистить</button>
+        </div>
+        <div class="table-responsive">
+          <table class="section-table" id="bodyTable">
+            <thead><tr><th>Вес (кг)</th><th>Рост (см)</th><th>Желаемый (кг)</th><th>Дата</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="row-actions"><button onclick="removeLast('body')">Удалить последнюю строку</button></div>
       </div>
     </div>
   </div>
@@ -781,18 +310,17 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, set, onValue, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-    // КОНФИГУРАЦИЯ: Вставь сюда свои точные ключи из настроек Firebase Console!
     const firebaseConfig = {
-      apiKey: "ТВОЙ_API_KEY",
-      authDomain: "твой-проект.firebaseapp.com",
-      projectId: "твой-проект",
-      storageBucket: "твой-проект.firebasestorage.app",
-      messagingSenderId: "отправитель",
-      appId: "айди-приложения",
-      databaseURL: "https://твой-проект-дефолт-ртдб.firebaseio.com"
+      apiKey: "AIzaSyA5O19ED6vp0RwWSwJLZ5u4lqXwyfQBA3Q",
+      authDomain: "fitstats-5ba4e.firebaseapp.com",
+      projectId: "fitstats-5ba4e",
+      storageBucket: "fitstats-5ba4e.firebasestorage.app",
+      messagingSenderId: "951177789502",
+      appId: "1:951177789502:web:1ab9c8353b245f14e9916f",
+      measurementId: "G-KLXS4VTNFF"
     };
 
     const app = initializeApp(firebaseConfig);
@@ -802,67 +330,22 @@
     let currentUser = null;
     let dbListenerRef = null;
 
-    const state = {
+    let state = {
       training: [],
       nutrition: [],
       body: [],
       selectedNutritionIndex: 0
     };
 
-    const trainingTableBody = document.querySelector('#trainingTable tbody');
-    const nutritionTableBody = document.querySelector('#nutritionTable tbody');
-    const bodyTableBody = document.querySelector('#bodyTable tbody');
-    const loginBtn = document.getElementById('loginFakeBtn');
-    const headerAuthBtn = document.getElementById('headerAuthBtn');
-    
-    // Элементы модального окна
-    const loginModal = document.getElementById('loginModal');
-    const closeModalBtn = document.getElementById('closeModalBtn');
-
-    // Логика открытия/закрытия всплывающего окна
-    function openModal() { loginModal.classList.add('open'); }
-    function closeModal() { loginModal.classList.remove('open'); }
-
-    closeModalBtn.addEventListener('click', closeModal);
-    // Закрытие при клике по затемненному фону вокруг карточки
-    loginModal.addEventListener('click', (e) => { if (e.target === loginModal) closeModal(); });
-
-    // Обработка клика на кнопку в Хедере (Вход / Выход)
-    headerAuthBtn.addEventListener('click', () => {
-      if (currentUser) {
-        // Если залогинен — кнопка работает на Выход
-        signOut(auth).then(() => showToast("Вы вышли из системы."));
-      } else {
-        // Если гость — открываем красивую всплывающую модалку
-        openModal();
-      }
-    });
-
-    // Настройка автоматической подсветки пунктов меню при скролле
-    const links = document.querySelectorAll('.nav-link');
-    const sections = document.querySelectorAll('#training, #nutrition, #body');
-
-    function setActiveLink() {
-      const scrollY = window.scrollY + 180;
-      links.forEach(link => link.classList.remove('active'));
-      sections.forEach(section => {
-        if (scrollY >= section.offsetTop && scrollY < section.offsetTop + section.offsetHeight) {
-          const active = document.querySelector(`.nav-link[href="#${section.id}"]`);
-          if (active) active.classList.add('active');
-        }
-      });
-    }
-    window.addEventListener('scroll', setActiveLink);
-
-    // Слушатель Firebase Auth
+    // Слушатель изменения состояния авторизации
     onAuthStateChanged(auth, (user) => {
       currentUser = user;
+      const headerBtn = document.getElementById('headerAuthBtn');
       
       if (user) {
-        closeModal(); // Закрываем окно после успешного входа
-        headerAuthBtn.textContent = `Выйти (${user.email.split('@')[0]})`;
-        headerAuthBtn.style.background = "#ffcccc";
-        headerAuthBtn.style.borderColor = "#ff9999";
+        headerBtn.textContent = `Выйти (${user.email})`;
+        headerBtn.style.background = "#ffcccc";
+        headerBtn.style.borderColor = "#ff9999";
         
         const userDbRef = ref(db, `users/${user.uid}/fitData`);
         dbListenerRef = onValue(userDbRef, (snapshot) => {
@@ -872,227 +355,299 @@
             state.nutrition = data.nutrition || [];
             state.body = data.body || [];
           } else {
-            state.training = []; state.nutrition = []; state.body = [];
+            state.training = [];
+            state.nutrition = [];
+            state.body = [];
           }
           renderAll();
         });
       } else {
-        headerAuthBtn.textContent = "Вход";
-        headerAuthBtn.style.background = "#d6f1dc";
-        headerAuthBtn.style.borderColor = "#6175ca";
+        headerBtn.textContent = "Вход / Регистрация";
+        headerBtn.style.background = "#d6f1dc";
+        headerBtn.style.borderColor = "#6175ca";
         
-        state.training = []; state.nutrition = []; state.body = [];
+        state.training = [];
+        state.nutrition = [];
+        state.body = [];
         state.selectedNutritionIndex = 0;
+        
         renderAll();
       }
     });
 
     function syncWithFirebase() {
-      if (!currentUser) return showToast("Войдите, чтобы сохранить изменения!");
+      if (!currentUser) return showToast("Ошибка: Вы не авторизованы!");
       set(ref(db, `users/${currentUser.uid}/fitData`), {
         training: state.training,
         nutrition: state.nutrition,
         body: state.body
-      }).catch(err => showToast("Ошибка синхронизации: " + err.message));
+      }).catch(err => showToast("Ошибка синхронизации с облаком"));
     }
 
-    // Логика кнопки внутри модального окна
-    loginBtn.addEventListener('click', () => {
-      const inputs = loginModal.querySelectorAll('.login-form input');
-      const email = inputs[0].value.trim();
-      const password = inputs[1].value;
+    window.handleHeaderAuthClick = function() {
+      if (currentUser) {
+        signOut(auth).then(() => {
+          showToast("Вы вышли из аккаунта.");
+          switchTab('home');
+        }).catch(err => showToast("Ошибка при выходе"));
+      } else {
+        switchTab('auth-tab');
+      }
+    }
 
-      if (!email || !password) return showToast("Заполните Email и пароль.");
+    document.getElementById('registerForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('regName').value.trim();
+      const email = document.getElementById('regEmail').value.trim();
+      const pass = document.getElementById('regPass').value;
+      const passConfirm = document.getElementById('regPassConfirm').value;
 
-      signInWithEmailAndPassword(auth, email, password)
-        .then(() => {
-          showToast("Успешный вход!");
-          loginModal.querySelectorAll('.login-form input').forEach(i => i.value = '');
+      if (!name) return showToast('Укажите ваше имя!');
+      if (pass !== passConfirm) return showToast('Ошибка: Пароли не совпадают!');
+      if (pass.length < 6) return showToast('Пароль должен быть от 6 символов!');
+
+      createUserWithEmailAndPassword(auth, email, pass)
+        .then((userCredential) => {
+          const uid = userCredential.user.uid;
+          set(ref(db, `users/${uid}/profile`), {
+            name: name,
+            email: email,
+            createdAt: new Date().toISOString()
+          }).then(() => {
+            showToast('Аккаунт успешно создан!');
+            switchTab('home');
+            document.getElementById('registerForm').reset();
+          });
         })
         .catch((error) => {
-          if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
-            createUserWithEmailAndPassword(auth, email, password)
-              .then(() => {
-                showToast("Новый аккаунт успешно создан!");
-                loginModal.querySelectorAll('.login-form input').forEach(i => i.value = '');
-              })
-              .catch(err => showToast("Ошибка создания аккаунта: " + err.message));
-          } else {
-            showToast("Ошибка: " + error.message);
-          }
+          if (error.code === 'auth/email-already-in-use') showToast('Этот Email уже занят!');
+          else showToast(`Ошибка: ${error.message}`);
         });
     });
 
-    // --- ФУНКЦИИ ДАННЫХ И РЕНДЕРА ТАБЛИЦ ---
+    document.getElementById('loginForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value.trim();
+      const pass = document.getElementById('loginPass').value;
 
-    function showToast(message) {
-      const toast = document.getElementById('toast');
-      if (!toast) return;
-      toast.textContent = message;
-      toast.classList.add('show');
-      clearTimeout(window.toastTimer);
-      window.toastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
+      signInWithEmailAndPassword(auth, email, pass)
+        .then(() => {
+          showToast('Вы успешно вошли.');
+          switchTab('home');
+          document.getElementById('loginForm').reset();
+        })
+        .catch(() => {
+          showToast('Неверный аккаунт или пароль!');
+        });
+    });
+
+    window.switchTab = function(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      const activeTab = document.getElementById(tabId);
+      if(activeTab) activeTab.classList.add('active');
     }
 
-    function formatDate(dateString) {
-      if (!dateString) return '';
-      const parts = dateString.split('-');
-      return parts.length === 3 ? `${parts[2]}.${parts[1]}.${parts[0]}` : dateString;
+    window.toggleAuthForms = function(showLogin) {
+      document.getElementById('login-block').style.display = showLogin ? 'block' : 'none';
+      document.getElementById('register-block').style.display = showLogin ? 'none' : 'block';
     }
 
-    function normalizeDate(dateString) {
-      if (!dateString) return '';
-      if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) return dateString;
-      if (/^\d{2}\.\d{2}\.\d{4}$/.test(dateString)) {
-        const [dd, mm, yyyy] = dateString.split('.');
-        return `${yyyy}-${mm}-${dd}`;
+    window.openModal = function(id) {
+      const modal = document.getElementById(id);
+      modal.style.display = 'flex';
+      setTimeout(() => modal.classList.add('show'), 10);
+      
+      const boxes = {
+        'trainingModal': 'trainingContentBox',
+        'nutritionModal': 'nutritionContentBox',
+        'bodyModal': 'bodyContentBox'
+      };
+
+      const contentBox = document.getElementById(boxes[id]);
+      if (contentBox) {
+        if (!currentUser) {
+          contentBox.style.opacity = '0.25';
+          contentBox.style.pointerEvents = 'none';
+          showToast("Пожалуйста, авторизуйтесь для доступа к дневнику.");
+        } else {
+          contentBox.style.opacity = '1';
+          contentBox.style.pointerEvents = 'all';
+        }
       }
-      return dateString;
+      renderAll();
+    }
+    
+    window.closeModal = function(id) {
+      const modal = document.getElementById(id);
+      modal.classList.remove('show');
+      setTimeout(() => modal.style.display = 'none', 250);
+    }
+    window.closeModalOnBackdrop = function(e) {
+      if(e.target.classList.contains('modal')) closeModal(e.target.id);
     }
 
-    function parseNumber(value) {
-      const normalized = String(value || '').replace(',', '.').replace(/[^\d.\-]/g, '');
-      const numeric = parseFloat(normalized);
-      return Number.isFinite(numeric) ? numeric : 0;
+    window.showToast = function(msg) {
+      const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show');
+      clearTimeout(window.tTimer); window.tTimer = setTimeout(() => t.classList.remove('show'), 2500);
+    }
+    
+    function fmtDate(d) { if(!d) return ''; const p = d.split('-'); return p.length===3 ? `${p[2]}.${p[1]}.${p[0]}` : d; }
+    function pNum(v) { return parseFloat(String(v).replace(/[^\d.]/g, '').replace(',', '.')) || 0; }
+
+    function createCell(text, onSave) {
+      const el = document.createElement('div'); el.className = 'editable-cell';
+      el.contentEditable = currentUser ? true : false; 
+      el.textContent = text || '';
+      el.addEventListener('blur', () => onSave(el.textContent.trim()));
+      el.addEventListener('keydown', e => { if(e.key === 'Enter') { e.preventDefault(); el.blur(); } });
+      return el;
     }
 
-    function createEditableCell(text, onSave) {
-      const wrapper = document.createElement('div');
-      wrapper.className = 'editable-cell';
-      wrapper.contentEditable = currentUser ? 'true' : 'false';
-      wrapper.spellcheck = false;
-      wrapper.textContent = text || '';
+    function updateCharts() {
+      let totalStepsCalculated = 0;
+      let weeklyStepsDistribution = [0, 0, 0, 0, 0, 0, 0];
 
-      wrapper.addEventListener('blur', () => {
-        if (!currentUser) return;
-        onSave(wrapper.textContent.trim());
+      if (state.training && state.training.length) {
+        state.training.forEach(row => {
+          let valueInSteps = pNum(row.value);
+          if (row.unit === 'км') valueInSteps = Math.round(valueInSteps * 1250);
+          totalStepsCalculated += valueInSteps;
+
+          if (row.date) {
+            const dateObj = new Date(row.date);
+            let dayOfWeek = dateObj.getDay(); 
+            let normalizedDay = dayOfWeek === 0 ? 6 : dayOfWeek - 1; 
+            if (!isNaN(normalizedDay)) weeklyStepsDistribution[normalizedDay] += valueInSteps;
+          }
+        });
+      }
+
+      const percent = Math.min(100, Math.round((totalStepsCalculated / 32000) * 100));
+      const donutEl = document.getElementById('trainingDonut');
+      if (donutEl) donutEl.style.background = `conic-gradient(var(--blue-dark) ${percent * 3.6}deg, #d5d5d5 0deg)`;
+      const percentEl = document.getElementById('trainingPercent');
+      if (percentEl) percentEl.textContent = `${percent}%`;
+
+      for (let i = 0; i < 7; i++) {
+        const dayValue = weeklyStepsDistribution[i];
+        const valEl = document.getElementById(`wd-${i+1}`);
+        const barEl = document.getElementById(`wb-${i+1}`);
+        if (valEl) valEl.textContent = dayValue >= 1000 ? (dayValue/1000).toFixed(1) + 'к' : dayValue;
+        if (barEl) barEl.style.height = `${Math.max(2, Math.min(110, (dayValue / 8000) * 110))}px`;
+      }
+
+      const row = state.nutrition[state.selectedNutritionIndex] || { breakfast: 0, lunch: 0, dinner: 0, date: '' };
+      ['breakfast', 'lunch', 'dinner'].forEach(k => {
+        const val = pNum(row[k]);
+        const valEl = document.getElementById(`${k}Value`);
+        const barEl = document.getElementById(`${k}Bar`);
+        if (valEl) valEl.textContent = val;
+        if (barEl) barEl.style.height = `${Math.max(2, Math.min(260, (val / 900) * 260))}px`;
       });
-      wrapper.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') { e.preventDefault(); wrapper.blur(); }
-      });
-      return wrapper;
+      const nutrDateEl = document.getElementById('nutritionSelectedDate');
+      if (nutrDateEl) nutrDateEl.textContent = row.date ? `Данные за ${fmtDate(row.date)}` : 'Выберите дату';
+
+      if (state.body && state.body.length > 0) {
+        const lastBody = state.body[state.body.length - 1];
+        const w = pNum(lastBody.current);
+        const h = pNum(lastBody.height) / 100;
+        if (w > 0 && h > 0) {
+          const bmi = (w / (h * h)).toFixed(1);
+          document.getElementById('bmiValue').textContent = bmi;
+          let status = "Норма";
+          if (bmi < 18.5) status = "Дефицит массы";
+          else if (bmi >= 25 && bmi < 30) status = "Избыточный вес";
+          else if (bmi >= 30) status = "Ожирение";
+          document.getElementById('bmiStatus').textContent = status;
+        }
+      } else {
+        document.getElementById('bmiValue').textContent = "--.-";
+        document.getElementById('bmiStatus').textContent = "Нет данных";
+      }
+    }
+
+    function renderTable(id, callback) {
+      const tbody = document.querySelector(`#${id}Table tbody`);
+      if(tbody) { tbody.innerHTML = ''; state[id].forEach((row, idx) => tbody.appendChild(callback(row, idx))); }
     }
 
     function renderAll() {
-      renderTrainingTable();
-      renderNutritionTable();
-      renderBodyTable();
-      setActiveLink();
-    }
-
-    // ТРЕНИРОВКИ
-    function updateTrainingChart() {
-      const total = state.training.reduce((sum, row) => sum + parseNumber(row.value), 0);
-      const percent = Math.min(100, Math.round((total / 32000) * 100));
-      const donut = document.getElementById('trainingDonut');
-      const percentLabel = document.getElementById('trainingPercent');
-      if (donut) donut.style.background = `conic-gradient(var(--blue-dark) 0deg ${percent * 3.6}deg, #d5d5d5 ${percent * 3.6}deg 360deg)`;
-      if (percentLabel) percentLabel.textContent = `${percent} %`;
-    }
-
-    function renderTrainingTable() {
-      if (!trainingTableBody) return;
-      trainingTableBody.innerHTML = '';
-      state.training.forEach((row, index) => {
+      renderTable('training', (row, idx) => {
         const tr = document.createElement('tr');
-        tr.insertCell().appendChild(createEditableCell(row.name, v => { state.training[index].name = v; syncWithFirebase(); }));
-        tr.insertCell().appendChild(createEditableCell(row.value, v => { state.training[index].value = v; syncWithFirebase(); }));
-        tr.insertCell().appendChild(createEditableCell(formatDate(normalizeDate(row.date)), v => { state.training[index].date = normalizeDate(v); syncWithFirebase(); renderTrainingTable(); }));
-        trainingTableBody.appendChild(tr);
+        tr.insertCell().appendChild(createCell(row.name, v => { state.training[idx].name = v; syncWithFirebase(); }));
+        tr.insertCell().appendChild(createCell(row.value, v => { state.training[idx].value = v; syncWithFirebase(); }));
+        tr.insertCell().appendChild(createCell(row.unit || 'шаги', v => { state.training[idx].unit = v; syncWithFirebase(); }));
+        tr.insertCell().appendChild(createCell(fmtDate(row.date), v => { state.training[idx].date = v; syncWithFirebase(); }));
+        return tr;
       });
-      updateTrainingChart();
-    }
 
-    // ПИТАНИЕ
-    function updateNutritionChart() {
-      if (state.selectedNutritionIndex >= state.nutrition.length) state.selectedNutritionIndex = Math.max(0, state.nutrition.length - 1);
-      const row = state.nutrition[state.selectedNutritionIndex] || { breakfast: 0, lunch: 0, dinner: 0, date: '' };
-      
-      const b = parseNumber(row.breakfast), l = parseNumber(row.lunch), d = parseNumber(row.dinner);
-      const max = Math.max(900, b, l, d), h = 260;
-
-      document.getElementById('breakfastBar').style.height = `${Math.max(2, Math.round((b/max)*h))}px`;
-      document.getElementById('lunchBar').style.height = `${Math.max(2, Math.round((l/max)*h))}px`;
-      document.getElementById('dinnerBar').style.height = `${Math.max(2, Math.round((d/max)*h))}px`;
-
-      document.getElementById('breakfastValue').textContent = b;
-      document.getElementById('lunchValue').textContent = l;
-      document.getElementById('dinnerValue').textContent = d;
-      document.getElementById('nutritionSelectedDate').textContent = row.date ? `Данные за ${formatDate(normalizeDate(row.date))}` : 'Выберите дату в таблице';
-    }
-
-    function renderNutritionTable() {
-      if (!nutritionTableBody) return;
-      nutritionTableBody.innerHTML = '';
-      state.nutrition.forEach((row, index) => {
+      renderTable('nutrition', (row, idx) => {
         const tr = document.createElement('tr');
-        tr.insertCell().appendChild(createEditableCell(row.breakfast, v => { state.nutrition[index].breakfast = v; syncWithFirebase(); updateNutritionChart(); }));
-        tr.insertCell().appendChild(createEditableCell(row.lunch, v => { state.nutrition[index].lunch = v; syncWithFirebase(); updateNutritionChart(); }));
-        tr.insertCell().appendChild(createEditableCell(row.dinner, v => { state.nutrition[index].dinner = v; syncWithFirebase(); updateNutritionChart(); }));
-        
-        const tdDate = tr.insertCell();
-        const btn = document.createElement('button'); btn.type = 'button'; btn.className = `date-pill ${index === state.selectedNutritionIndex ? 'active' : ''}`;
-        btn.textContent = formatDate(normalizeDate(row.date)) || '---';
-        btn.onclick = () => { state.selectedNutritionIndex = index; updateNutritionChart(); renderNutritionTable(); };
-        tdDate.appendChild(btn);
-        nutritionTableBody.appendChild(tr);
+        ['breakfast', 'lunch', 'dinner'].forEach(k => {
+          tr.insertCell().appendChild(createCell(row[k], v => { state.nutrition[idx][k] = v; syncWithFirebase(); }));
+        });
+        const btn = document.createElement('button'); btn.className = `date-pill ${idx === state.selectedNutritionIndex ? 'active' : ''}`;
+        btn.textContent = fmtDate(row.date) || '---';
+        btn.onclick = () => { if(currentUser) { state.selectedNutritionIndex = idx; renderAll(); } };
+        tr.insertCell().appendChild(btn);
+        return tr;
       });
-      updateNutritionChart();
-    }
 
-    // ТЕЛО
-    function renderBodyTable() {
-      if (!bodyTableBody) return;
-      bodyTableBody.innerHTML = '';
-      state.body.forEach((row, index) => {
+      renderTable('body', (row, idx) => {
         const tr = document.createElement('tr');
-        tr.insertCell().appendChild(createEditableCell(row.current, v => { state.body[index].current = v; syncWithFirebase(); }));
-        tr.insertCell().appendChild(createEditableCell(row.target, v => { state.body[index].target = v; syncWithFirebase(); }));
-        tr.insertCell().appendChild(createEditableCell(formatDate(normalizeDate(row.date)), v => { state.body[index].date = normalizeDate(v); syncWithFirebase(); renderBodyTable(); }));
-        bodyTableBody.appendChild(tr);
+        tr.insertCell().appendChild(createCell(row.current, v => { state.body[idx].current = v; syncWithFirebase(); }));
+        tr.insertCell().appendChild(createCell(row.height, v => { state.body[idx].height = v; syncWithFirebase(); }));
+        tr.insertCell().appendChild(createCell(row.target, v => { state.body[idx].target = v; syncWithFirebase(); }));
+        tr.insertCell().appendChild(createCell(fmtDate(row.date), v => { state.body[idx].date = v; syncWithFirebase(); }));
+        return tr;
       });
+
+      updateCharts();
     }
 
-    // ОБРАБОТЧИКИ КНОПОК ТАБЛИЦ
-    document.getElementById('addTrainingBtn')?.addEventListener('click', () => {
-      if (!currentUser) return showToast("Сначала войдите в аккаунт!");
+    window.addTraining = function() {
+      if(!currentUser) return;
       const name = document.getElementById('trainingNameInput').value.trim();
       const value = document.getElementById('trainingValueInput').value.trim();
+      const unit = document.getElementById('trainingUnitInput').value;
       const date = document.getElementById('trainingDateInput').value;
-      state.training.push({ name, value, date }); syncWithFirebase();
-      document.getElementById('trainingNameInput').value = ''; document.getElementById('trainingValueInput').value = ''; document.getElementById('trainingDateInput').value = '';
-    });
+      if(!name && !value && !date) return showToast('Заполните поля');
+      state.training.push({ name, value, unit, date }); syncWithFirebase();
+    }
 
-    document.getElementById('clearTrainingBtn')?.addEventListener('click', () => { if(currentUser) { state.training = []; syncWithFirebase(); } });
-    document.getElementById('removeTrainingBtn')?.addEventListener('click', () => { if(currentUser && state.training.length) { state.training.pop(); syncWithFirebase(); } });
-
-    document.getElementById('addNutritionBtn')?.addEventListener('click', () => {
-      if (!currentUser) return showToast("Сначала войдите в аккаунт!");
+    window.addNutrition = function() {
+      if(!currentUser) return;
       const breakfast = document.getElementById('breakfastInput').value.trim();
       const lunch = document.getElementById('lunchInput').value.trim();
       const dinner = document.getElementById('dinnerInput').value.trim();
       const date = document.getElementById('nutritionDateInput').value;
       state.nutrition.push({ breakfast, lunch, dinner, date });
-      state.selectedNutritionIndex = state.nutrition.length - 1; syncWithFirebase();
-      document.getElementById('breakfastInput').value = ''; document.getElementById('lunchInput').value = ''; document.getElementById('dinnerInput').value = ''; document.getElementById('nutritionDateInput').value = '';
-    });
+      state.selectedNutritionIndex = state.nutrition.length - 1;
+      syncWithFirebase();
+    }
 
-    document.getElementById('clearNutritionBtn')?.addEventListener('click', () => { if(currentUser) { state.nutrition = []; state.selectedNutritionIndex = 0; syncWithFirebase(); } });
-    document.getElementById('removeNutritionBtn')?.addEventListener('click', () => { if(currentUser && state.nutrition.length) { state.nutrition.pop(); state.selectedNutritionIndex = Math.max(0, state.nutrition.length - 1); syncWithFirebase(); } });
-
-    document.getElementById('addBodyBtn')?.addEventListener('click', () => {
-      if (!currentUser) return showToast("Сначала войдите в аккаунт!");
+    window.addBody = function() {
+      if(!currentUser) return;
       const current = document.getElementById('currentWeightInput').value.trim();
+      const height = document.getElementById('currentHeightInput').value.trim();
       const target = document.getElementById('targetWeightInput').value.trim();
       const date = document.getElementById('bodyDateInput').value;
-      state.body.push({ current, target, date }); syncWithFirebase();
-      document.getElementById('currentWeightInput').value = ''; document.getElementById('targetWeightInput').value = ''; document.getElementById('bodyDateInput').value = '';
-    });
+      state.body.push({ current, height, target, date }); syncWithFirebase();
+    }
 
-    document.getElementById('clearBodyBtn')?.addEventListener('click', () => { if(currentUser) { state.body = []; syncWithFirebase(); } });
-    document.getElementById('removeBodyBtn')?.addEventListener('click', () => { if(currentUser && state.body.length) { state.body.pop(); syncWithFirebase(); } });
+    window.removeLast = function(key) {
+      if(!currentUser || !state[key].length) return;
+      state[key].pop();
+      if(key === 'nutrition') state.selectedNutritionIndex = Math.max(0, state.nutrition.length - 1);
+      syncWithFirebase();
+    }
 
-    renderAll();
+    window.clearData = function(key) {
+      if(!currentUser) return;
+      state[key] = [];
+      if(key === 'nutrition') state.selectedNutritionIndex = 0;
+      syncWithFirebase();
+    }
   </script>
 </body>
 </html>

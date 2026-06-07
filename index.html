@@ -55,13 +55,13 @@
     /* Модальные окна */
     .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.25s ease; }
     .modal.show { display: flex; opacity: 1; }
-    .modal-box { background: var(--bg); width: 90%; max-width: 1000px; max-height: 85vh; overflow-y: auto; border-radius: 24px; padding: 30px; position: relative; display: grid; grid-template-columns: 40% 60%; gap: 30px; }
+    .modal-box { background: var(--bg); width: 90%; max-width: 1050px; max-height: 85vh; overflow-y: auto; border-radius: 24px; padding: 30px; position: relative; display: grid; grid-template-columns: 42% 58%; gap: 30px; }
     .close-modal { position: absolute; top: 15px; right: 20px; font-size: 30px; cursor: pointer; color: var(--muted); }
 
-    /* Базовые компоненты форм и таблиц */
+    /* Базовые компоненты форм, инпутов и таблиц */
     .toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
-    .toolbar input, .auth-form input { height: 42px; padding: 0 14px; border: 2px solid rgba(87,114,204,0.3); border-radius: 10px; outline: none; font-size: 14px; width: 100%; }
-    .toolbar input { width: auto; }
+    .toolbar input, .toolbar select, .auth-form input { height: 42px; padding: 0 14px; border: 2px solid rgba(87,114,204,0.3); border-radius: 10px; outline: none; font-size: 14px; background: #fff; }
+    .toolbar input, .toolbar select { width: auto; }
     .toolbar button, .row-actions button, .auth-form button { height: 42px; padding: 0 16px; border: none; border-radius: 10px; background: var(--blue); color: #fff; cursor: pointer; font-size: 15px; font-weight: bold; }
     .row-actions button { background: #7e91df; margin-top: 10px; }
     .hint { font-size: 13px; color: #5f6d91; margin-bottom: 10px; }
@@ -73,27 +73,35 @@
     .date-pill { padding: 4px 12px; border-radius: 12px; background: #e1e1e1; border: none; cursor: pointer; }
     .date-pill.active { background: #cfd9ff; font-weight: bold; }
 
-    /* Графики */
-    .donut { width: 260px; height: 260px; margin: 0 auto 15px; border-radius: 50%; position: relative; background: conic-gradient(var(--blue-dark) 0deg, #d5d5d5 0deg); display: flex; align-items: center; justify-content: center; }
-    .donut::before { content: ""; position: absolute; inset: 50px; background: var(--bg); border-radius: 50%; }
-    .donut-value { position: relative; font-size: 42px; font-weight: bold; color: #111; z-index: 2; }
+    /* Графики (Круговой прогресс) */
+    .donut { width: 200px; height: 200px; margin: 0 auto 15px; border-radius: 50%; position: relative; background: conic-gradient(var(--blue-dark) 0deg, #d5d5d5 0deg); display: flex; align-items: center; justify-content: center; }
+    .donut::before { content: ""; position: absolute; inset: 40px; background: var(--bg); border-radius: 50%; }
+    .donut-value { position: relative; font-size: 36px; font-weight: bold; color: #111; z-index: 2; }
 
-    .chart-area { position: relative; height: 320px; padding: 20px 10px 40px 40px; background: #fff; border-radius: 12px; border: 1px solid #ddd; }
+    /* Общая стилизация зон для графиков (Питание и Тренировки) */
+    .chart-area { position: relative; height: 220px; padding: 20px 10px 40px 40px; background: #fff; border-radius: 12px; border: 1px solid #ddd; margin-bottom: 20px; }
     .grid-line { position: absolute; left: 40px; right: 10px; height: 1px; background: #eee; }
-    .grid-line span { position: absolute; left: -32px; top: -8px; font-size: 12px; }
-    .bars { position: absolute; left: 50px; right: 10px; bottom: 40px; top: 20px; display: flex; align-items: flex-end; gap: 15px; }
+    .grid-line span { position: absolute; left: -35px; top: -8px; font-size: 11px; }
+    
+    /* Столбцы */
+    .bars { position: absolute; left: 50px; right: 10px; bottom: 40px; top: 20px; display: flex; align-items: flex-end; gap: 10px; }
     .bar-group { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; }
-    .bar { width: 100%; border-radius: 8px 8px 0 0; transition: height 0.25s; min-height: 2px; }
+    .bar { width: 100%; border-radius: 6px 6px 0 0; transition: height 0.25s; min-height: 2px; }
+    
+    /* Цвета столбцов питания */
     .bar.breakfast { background: #a9d5b3; } .bar.lunch { background: #a8cbd9; } .bar.dinner { background: #91aee8; }
-    .bar-label { margin-top: 6px; font-size: 13px; }
-    .bar-value { margin-bottom: 4px; font-size: 13px; font-weight: bold; color: var(--blue-dark); }
+    /* Цвета столбцов тренировок (Неделя) */
+    .bar.workout-day { background: #6175ca; }
+    
+    .bar-label { margin-top: 6px; font-size: 11px; text-transform: short; white-space: nowrap; }
+    .bar-value { margin-bottom: 4px; font-size: 11px; font-weight: bold; color: var(--blue-dark); }
 
     /* Виджет ИМТ */
     .bmi-display { background: #fff; padding: 20px; border-radius: 16px; border: 2px solid rgba(87,114,204,0.15); margin-top: 15px; text-align: center; }
     .bmi-value { font-size: 36px; font-weight: bold; color: var(--blue-dark); margin: 5px 0; }
     .bmi-status { font-size: 16px; font-weight: bold; color: #5f6d91; }
 
-    /* Авторизация (Карточка) */
+    /* Авторизация */
     .auth-card { background: #fff; border-radius: 24px; padding: 35px; border: 2px solid rgba(87,114,204,0.15); box-shadow: 0 10px 25px rgba(0,0,0,0.03); }
     .auth-card h2 { margin-bottom: 20px; color: var(--blue); font-family: Georgia, serif; text-align: center; }
     .auth-form { display: grid; gap: 14px; }
@@ -127,7 +135,7 @@
       <div class="stats-features">
         <div class="feature-card" onclick="openModal('trainingModal')">
           <h3>🏃‍♂️ Тренировки</h3>
-          <p>Фиксация активности и отслеживание недельных целей.</p>
+          <p>Фиксация активности, выбор шагов/км и недельные графики.</p>
         </div>
         <div class="feature-card" onclick="openModal('nutritionModal')">
           <h3>🍏 Питание</h3>
@@ -153,7 +161,7 @@
     </div>
 
     <div class="auth-card" id="register-block" style="display: none;">
-      <h2>Registration</h2>
+      <h2>Регистрация</h2>
       <form class="auth-form" onsubmit="handleAuth(event, 'register')">
         <input type="text" id="regName" placeholder="Ваше имя" required />
         <input type="text" id="regUser" placeholder="Придумайте логин" required />
@@ -171,19 +179,37 @@
       <span class="close-modal" onclick="closeModal('trainingModal')">&times;</span>
       <div class="pane-left">
         <div class="donut" id="trainingDonut"><div class="donut-value" id="trainingPercent">0%</div></div>
-        <h3>Прогресс недели (Цель: 32к)</h3>
+        <h4 style="margin-bottom: 15px;">Цель недели: 32 000 шагов</h4>
+        
+        <div class="chart-area" style="height: 180px;">
+          <div class="grid-line" style="top:30px;"><span>8к</span></div>
+          <div class="grid-line" style="top:80px;"><span>4к</span></div>
+          <div class="bars" style="bottom: 30px;">
+            <div class="bar-group"><div class="bar-value" id="wd-1">0</div><div class="bar workout-day" id="wb-1"></div><div class="bar-label">Пн</div></div>
+            <div class="bar-group"><div class="bar-value" id="wd-2">0</div><div class="bar workout-day" id="wb-2"></div><div class="bar-label">Вт</div></div>
+            <div class="bar-group"><div class="bar-value" id="wd-3">0</div><div class="bar workout-day" id="wb-3"></div><div class="bar-label">Ср</div></div>
+            <div class="bar-group"><div class="bar-value" id="wd-4">0</div><div class="bar workout-day" id="wb-4"></div><div class="bar-label">Чт</div></div>
+            <div class="bar-group"><div class="bar-value" id="wd-5">0</div><div class="bar workout-day" id="wb-5"></div><div class="bar-label">Пт</div></div>
+            <div class="bar-group"><div class="bar-value" id="wd-6">0</div><div class="bar workout-day" id="wb-6"></div><div class="bar-label">Сб</div></div>
+            <div class="bar-group"><div class="bar-value" id="wd-7">0</div><div class="bar workout-day" id="wb-7"></div><div class="bar-label">Вс</div></div>
+          </div>
+        </div>
       </div>
       <div>
         <div class="toolbar">
-          <input id="trainingNameInput" type="text" placeholder="Упражнение" />
-          <input id="trainingValueInput" type="text" placeholder="Шаги / км" style="width:100px;" />
+          <input id="trainingNameInput" type="text" placeholder="Упражнение (напр. Бег)" style="width:140px;" />
+          <input id="trainingValueInput" type="number" placeholder="Кол-во" style="width:80px;" />
+          <select id="trainingUnitInput">
+            <option value="шаги">шаги</option>
+            <option value="км">км</option>
+          </select>
           <input id="trainingDateInput" type="date" />
           <button onclick="addTraining()">+</button>
           <button onclick="clearData('training')">Очистить</button>
         </div>
-        <p class="hint">Значения можно редактировать прямо в ячейках таблицы.</p>
+        <p class="hint">Редактировать значения и единицы (шаги/км) можно прямо в таблице.</p>
         <table class="section-table" id="trainingTable">
-          <thead><tr><th>Активность</th><th>Результат</th><th>Дата</th></tr></thead>
+          <thead><tr><th>Активность</th><th>Результат</th><th>Ед. изм.</th><th>Дата</th></tr></thead>
           <tbody></tbody>
         </table>
         <div class="row-actions"><button onclick="removeLast('training')">Удалить последнюю строку</button></div>
@@ -280,7 +306,6 @@
       selectedNutritionIndex: 0
     };
 
-    // Слушаем изменения в Firebase в реальном времени
     onValue(ref(db, 'fitData'), (snapshot) => {
       const data = snapshot.val();
       if (data) {
@@ -357,19 +382,55 @@
       return el;
     }
 
-    // Обновление графиков и ИМТ
+    // Обновление графиков, ИМТ и рабочей недельной диаграммы
     function updateCharts() {
-      // 1. Исправление круга тренировок
-      const totalSteps = (state.training && state.training.length) 
-        ? state.training.reduce((s, r) => s + pNum(r.value), 0) 
-        : 0;
-      const percent = Math.min(100, Math.round((totalSteps / 32000) * 100));
-      const donutEl = document.getElementById('trainingDonut');
-      if (donutEl) {
-        donutEl.style.background = `conic-gradient(var(--blue-dark) ${percent * 3.6}deg, #d5d5d5 0deg)`;
+      // 1. Расчет шагов и км для кругового прогресс-бара
+      let totalStepsCalculated = 0;
+      
+      // Массив для хранения шагов по дням недели (индекс 0 - Пн, ..., 6 - Вс)
+      let weeklyStepsDistribution = [0, 0, 0, 0, 0, 0, 0];
+
+      if (state.training && state.training.length) {
+        state.training.forEach(row => {
+          let valueInSteps = pNum(row.value);
+          // Конвертируем километры в шаги для графика (1 км = 1250 шагов)
+          if (row.unit === 'км') {
+            valueInSteps = Math.round(valueInSteps * 1250);
+          }
+          totalStepsCalculated += valueInSteps;
+
+          // Группируем по дням недели для столбчатой диаграммы
+          if (row.date) {
+            const dateObj = new Date(row.date);
+            let dayOfWeek = dateObj.getDay(); // 0 - Вс, 1 - Пн, ..., 6 - Сб
+            let normalizedDay = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Делаем 0 - Пн, ..., 6 - Вс
+            if (!isNaN(normalizedDay)) {
+              weeklyStepsDistribution[normalizedDay] += valueInSteps;
+            }
+          }
+        });
       }
+
+      // Обновляем круговой прогресс
+      const percent = Math.min(100, Math.round((totalStepsCalculated / 32000) * 100));
+      const donutEl = document.getElementById('trainingDonut');
+      if (donutEl) donutEl.style.background = `conic-gradient(var(--blue-dark) ${percent * 3.6}deg, #d5d5d5 0deg)`;
       const percentEl = document.getElementById('trainingPercent');
       if (percentEl) percentEl.textContent = `${percent}%`;
+
+      // Обновляем СТОЛБЧАТУЮ ДИАГРАММУ по дням недели (Максимум шкалы сделаем 8000 шагов)
+      for (let i = 0; i < 7; i++) {
+        const dayValue = weeklyStepsDistribution[i];
+        const valEl = document.getElementById(`wd-${i+1}`);
+        const barEl = document.getElementById(`wb-${i+1}`);
+        
+        if (valEl) valEl.textContent = dayValue >= 1000 ? (dayValue/1000).toFixed(1) + 'к' : dayValue;
+        if (barEl) {
+          // Максимальная высота столбца 110px при 8000+ шагах в день
+          const barHeight = Math.max(2, Math.min(110, (dayValue / 8000) * 110));
+          barEl.style.height = `${barHeight}px`;
+        }
+      }
 
       // 2. Питание
       const row = state.nutrition[state.selectedNutritionIndex] || { breakfast: 0, lunch: 0, dinner: 0, date: '' };
@@ -383,16 +444,14 @@
       const nutrDateEl = document.getElementById('nutritionSelectedDate');
       if (nutrDateEl) nutrDateEl.textContent = row.date ? `Данные за ${fmtDate(row.date)}` : 'Выберите дату';
 
-      // 3. Динамический расчет ИМТ на основе Роста и Веса
+      // 3. ИМТ
       if (state.body && state.body.length > 0) {
         const lastBody = state.body[state.body.length - 1];
         const w = pNum(lastBody.current);
-        const h = pNum(lastBody.height) / 100; // перевод см в метры
-        
+        const h = pNum(lastBody.height) / 100;
         if (w > 0 && h > 0) {
           const bmi = (w / (h * h)).toFixed(1);
           document.getElementById('bmiValue').textContent = bmi;
-          
           let status = "Норма";
           if (bmi < 18.5) status = "Дефицит массы";
           else if (bmi >= 25 && bmi < 30) status = "Избыточный вес";
@@ -415,6 +474,7 @@
         const tr = document.createElement('tr');
         tr.insertCell().appendChild(createCell(row.name, v => { state.training[idx].name = v; syncWithFirebase(); }));
         tr.insertCell().appendChild(createCell(row.value, v => { state.training[idx].value = v; syncWithFirebase(); }));
+        tr.insertCell().appendChild(createCell(row.unit || 'шаги', v => { state.training[idx].unit = v; syncWithFirebase(); }));
         tr.insertCell().appendChild(createCell(fmtDate(row.date), v => { state.training[idx].date = v; syncWithFirebase(); }));
         return tr;
       });
@@ -446,10 +506,11 @@
     window.addTraining = function() {
       const name = document.getElementById('trainingNameInput').value.trim();
       const value = document.getElementById('trainingValueInput').value.trim();
+      const unit = document.getElementById('trainingUnitInput').value;
       const date = document.getElementById('trainingDateInput').value;
       if(!name && !value && !date) return showToast('Заполните поля');
-      state.training.push({ name, value, date }); syncWithFirebase();
-      showToast('Строка добавлена');
+      state.training.push({ name, value, unit, date }); syncWithFirebase();
+      showToast('Тренировка успешно добавлена');
     }
 
     window.addNutrition = function() {

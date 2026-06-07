@@ -37,38 +37,56 @@
     .login-button { border: 3px solid #6175ca; background: #d6f1dc; font-weight: bold; }
     .nav-link:hover, .login-button:hover { transform: translateY(-1px); opacity: 0.9; }
 
-    /* Кнопка бургер-меню */
-    .burger-menu-btn {
+    /* Нижняя мобильная навигация (Скрыта на ПК) */
+    .mobile-bottom-nav {
       display: none;
-      flex-direction: column;
-      justify-content: space-between;
-      width: 30px;
-      height: 21px;
-      background: transparent;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 65px;
+      background: #ffffff;
+      box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.08);
+      z-index: 1000;
+      justify-content: space-around;
+      align-items: center;
+      padding: 0 10px;
+    }
+    .mobile-nav-item {
+      background: none;
       border: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      font-size: 11px;
       cursor: pointer;
-      z-index: 130; /* ИСПРАВЛЕНО: Самый верхний уровень, чтобы бургер всегда кликался */
+      flex: 1;
+      height: 100%;
+      gap: 4px;
+      transition: color 0.2s ease;
     }
-    .burger-menu-btn span {
-      display: block;
-      width: 100%;
-      height: 3px;
-      background-color: var(--blue);
-      border-radius: 3px;
-      transition: all 0.3s ease;
+    .mobile-nav-item .icon {
+      font-size: 20px;
     }
-    .burger-menu-btn.open span:nth-child(1) { transform: translateY(9px) rotate(45deg); }
-    .burger-menu-btn.open span:nth-child(2) { opacity: 0; }
-    .burger-menu-btn.open span:nth-child(3) { transform: translateY(-9px) rotate(-45deg); }
+    .mobile-nav-item.active {
+      color: var(--blue);
+      font-weight: bold;
+    }
 
-    /* Затемнение заднего фона */
-    .nav-overlay {
-      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-      background: rgba(0, 0, 0, 0.4); 
-      z-index: 110; /* ИСПРАВЛЕНО: Ниже, чем само меню */
-      opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+    /* Мобильная кнопка профиля в хедере */
+    .mobile-profile-btn {
+      display: none;
+      background: #d6f1dc;
+      border: 2px solid #6175ca;
+      padding: 8px 12px;
+      border-radius: 10px;
+      color: var(--blue);
+      font-weight: bold;
+      font-size: 14px;
+      cursor: pointer;
     }
-    .nav-overlay.show { opacity: 1; pointer-events: all; }
 
     /* Вкладки (Табы) */
     .tab-content { display: none; max-width: 1100px; margin: 40px auto; padding: 20px; }
@@ -88,7 +106,7 @@
     .feature-card h3 { color: var(--blue); margin-bottom: 8px; }
 
     /* Модальные окна */
-    .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.25s ease; padding: 10px; }
+    .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 2000; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.25s ease; padding: 10px; }
     .modal.show { display: flex; opacity: 1; }
     .modal-box { background: var(--bg); width: 90%; max-width: 1050px; max-height: 85vh; overflow-y: auto; border-radius: 24px; padding: 30px; position: relative; display: grid; grid-template-columns: 42% 58%; gap: 30px; }
     .close-modal { position: absolute; top: 15px; right: 20px; font-size: 30px; cursor: pointer; color: var(--muted); }
@@ -139,57 +157,33 @@
     .auth-form { display: grid; gap: 14px; }
     .auth-toggle { margin-top: 20px; text-align: center; font-size: 14px; color: var(--blue); cursor: pointer; text-decoration: underline; }
     
-    .toast { position: fixed; right: 20px; bottom: 20px; z-index: 300; background: rgba(55, 75, 159, 0.95); color: white; padding: 12px 20px; border-radius: 10px; font-size: 14px; opacity: 0; transform: translateY(10px); pointer-events: none; transition: 0.25s; }
+    .toast { position: fixed; right: 20px; bottom: 80px; z-index: 3000; background: rgba(55, 75, 159, 0.95); color: white; padding: 12px 20px; border-radius: 10px; font-size: 14px; opacity: 0; transform: translateY(10px); pointer-events: none; transition: 0.25s; }
     .toast.show { opacity: 1; transform: translateY(0); }
 
     /* Адаптивные медиа-запросы для мобильных устройств */
     @media (max-width: 992px) {
-      .site-header { padding: 15px 20px; min-height: 80px; }
-      .brand-title { font-size: 32px; }
+      body { padding-bottom: 85px; } /* Добавляем отступ снизу, чтобы контент не перекрывался меню */
+      .site-header { padding: 15px 20px; min-height: 70px; }
+      .brand-title { font-size: 28px; }
       
-      .burger-menu-btn { display: flex; }
+      /* Скрываем ПК-навигацию */
+      .nav { display: none; }
 
-      /* Выезжающая боковая панель */
-      .nav {
-        position: fixed;
-        top: 0;
-        right: -280px;
-        width: 280px;
-        height: 100vh;
-        background: #fff;
-        box-shadow: -5px 0 15px rgba(0,0,0,0.1);
-        flex-direction: column;
-        align-items: stretch;
-        justify-content: flex-start;
-        padding: 80px 20px 20px 20px;
-        gap: 15px;
-        transition: right 0.3s ease-in-out;
-        z-index: 120; /* ИСПРАВЛЕНО: Меню теперь поверх оверлея затемнения */
-      }
-      .nav.open { right: 0; }
+      /* Показываем аккуратную нижнюю панель и мобильный профиль */
+      .mobile-bottom-nav { display: flex; }
+      .mobile-profile-btn { display: block; }
 
-      .nav-link, .login-button {
-        width: 100%;
-        text-align: left;
-        padding: 14px 20px;
-        font-size: 16px;
-        border-radius: 10px;
-        background: var(--bg);
-      }
-      .nav-link.active { border-color: var(--blue); background: rgba(83, 109, 204, 0.1); }
-      .login-button { border: 2px solid #6175ca; background: #e2f7e7; text-align: center; margin-top: auto; }
+      .tab-content.active { grid-template-columns: 1fr; gap: 20px; margin: 15px auto; }
+      .home-content h1 { font-size: 32px; text-align: center; }
+      .home-text { font-size: 16px; text-align: center; }
+      .stats-features { grid-template-columns: 1fr; gap: 12px; }
 
-      .tab-content.active { grid-template-columns: 1fr; gap: 20px; margin: 20px auto; }
-      .home-content h1 { font-size: 36px; text-align: center; }
-      .home-text { font-size: 18px; text-align: center; }
-      .stats-features { grid-template-columns: 1fr; gap: 15px; }
-
-      .modal-box { grid-template-columns: 1fr; gap: 20px; padding: 25px 15px 15px; width: 100%; max-height: 95vh; }
+      .modal-box { grid-template-columns: 1fr; gap: 20px; padding: 25px 15px 15px; width: 100%; max-height: 92vh; }
       .close-modal { top: 5px; right: 10px; }
     }
 
     @media (max-width: 480px) {
-      .brand-title { font-size: 26px; }
+      .brand-title { font-size: 24px; }
       .toolbar { flex-direction: column; }
       .toolbar input, .toolbar select, .toolbar button { width: 100% !important; }
     }
@@ -197,26 +191,39 @@
 </head>
 <body>
 
-  <div class="nav-overlay" id="navOverlay" onclick="toggleMobileMenu(false)"></div>
-
   <header class="site-header">
     <a class="brand" href="#" onclick="switchTab('home')">
       <div class="brand-title">MyFitStats</div>
     </a>
     
-    <button class="burger-menu-btn" id="burgerBtn" onclick="toggleMobileMenu()">
-      <span></span>
-      <span></span>
-      <span></span>
-    </button>
-
     <nav class="nav" id="mainNav">
-      <button class="nav-link" onclick="handleMenuAction('trainingModal')">Дневник тренировок</button>
-      <button class="nav-link" onclick="handleMenuAction('nutritionModal')">Дневник питания</button>
-      <button class="nav-link" onclick="handleMenuAction('bodyModal')">Оценка тела</button>
-      <button class="login-button" id="headerAuthBtn" onclick="handleMenuAction('auth')">Вход / Регистрация</button>
+      <button class="nav-link" onclick="openModal('trainingModal')">Дневник тренировок</button>
+      <button class="nav-link" onclick="openModal('nutritionModal')">Дневник питания</button>
+      <button class="nav-link" onclick="openModal('bodyModal')">Оценка тела</button>
+      <button class="login-button" id="headerAuthBtn" onclick="handleHeaderAuthClick()">Вход / Регистрация</button>
     </nav>
+
+    <button class="mobile-profile-btn" id="mobileAuthBtn" onclick="switchTab('auth-tab')">👤 Вход</button>
   </header>
+
+  <nav class="mobile-bottom-nav">
+    <button class="mobile-nav-item active" id="mNavHome" onclick="switchTab('home')">
+      <span class="icon">🏠</span>
+      <span>Главная</span>
+    </button>
+    <button class="mobile-nav-item" id="mNavTrain" onclick="openModal('trainingModal')">
+      <span class="icon">🏃‍♂️</span>
+      <span>Тренировки</span>
+    </button>
+    <button class="mobile-nav-item" id="mNavNutr" onclick="openModal('nutritionModal')">
+      <span class="icon">🍏</span>
+      <span>Питание</span>
+    </button>
+    <button class="mobile-nav-item" id="mNavBody" onclick="openModal('bodyModal')">
+      <span class="icon">⚖️</span>
+      <span>Замеры</span>
+    </button>
+  </nav>
 
   <section class="tab-content active" id="home">
     <div class="pane-left">
@@ -254,7 +261,7 @@
     </div>
 
     <div class="auth-card" id="register-block" style="display: none;">
-      <h2>Регистрация</h2>
+      <h2>Registration</h2>
       <form class="auth-form" id="registerForm">
         <input type="text" id="regName" placeholder="Ваше имя" required />
         <input type="email" id="regEmail" placeholder="Укажите Email" required />
@@ -380,7 +387,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, set, onValue, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
     const firebaseConfig = {
@@ -407,41 +414,21 @@
       selectedNutritionIndex: 0
     };
 
-    window.toggleMobileMenu = function(flag) {
-      const burgerBtn = document.getElementById('burgerBtn');
-      const mainNav = document.getElementById('mainNav');
-      const overlay = document.getElementById('navOverlay');
-      
-      const shouldOpen = (flag !== undefined) ? flag : !mainNav.classList.contains('open');
-      
-      if (shouldOpen) {
-        burgerBtn.classList.add('open');
-        mainNav.classList.add('open');
-        overlay.classList.add('show');
-      } else {
-        burgerBtn.classList.remove('open');
-        mainNav.classList.remove('open');
-        overlay.classList.remove('show');
-      }
-    }
-
-    window.handleMenuAction = function(actionType) {
-      window.toggleMobileMenu(false); 
-      if (actionType === 'auth') {
-        window.handleHeaderAuthClick();
-      } else {
-        window.openModal(actionType);
-      }
-    }
-
+    // Отслеживание состояния авторизации
     onAuthStateChanged(auth, (user) => {
       currentUser = user;
       const headerBtn = document.getElementById('headerAuthBtn');
+      const mobileBtn = document.getElementById('mobileAuthBtn');
       
       if (user) {
-        headerBtn.textContent = `Выйти (${user.email})`;
+        const textOut = `Выйти (${user.email.split('@')[0]})`;
+        headerBtn.textContent = textOut;
         headerBtn.style.background = "#ffcccc";
         headerBtn.style.borderColor = "#ff9999";
+
+        mobileBtn.textContent = "🚪 Выход";
+        mobileBtn.style.background = "#ffcccc";
+        mobileBtn.style.borderColor = "#ff9999";
         
         const userDbRef = ref(db, `users/${user.uid}/fitData`);
         dbListenerRef = onValue(userDbRef, (snapshot) => {
@@ -459,6 +446,10 @@
         headerBtn.textContent = "Вход / Регистрация";
         headerBtn.style.background = "#d6f1dc";
         headerBtn.style.borderColor = "#6175ca";
+
+        mobileBtn.textContent = "👤 Вход";
+        mobileBtn.style.background = "#d6f1dc";
+        mobileBtn.style.borderColor = "#6175ca";
         
         state.training = []; state.nutrition = []; state.body = [];
         state.selectedNutritionIndex = 0;
@@ -472,7 +463,7 @@
         training: state.training,
         nutrition: state.nutrition,
         body: state.body
-      }).catch(err => showToast("Ошибка синхронизации с облаком"));
+      }).catch(err => showToast("Ошибка синхронизации"));
     }
 
     window.handleHeaderAuthClick = function() {
@@ -486,6 +477,11 @@
       }
     }
 
+    // Переназначим мобильную кнопку на логику десктопной
+    document.getElementById('mobileAuthBtn').onclick = function() {
+      window.handleHeaderAuthClick();
+    };
+
     document.getElementById('registerForm').addEventListener('submit', (e) => {
       e.preventDefault();
       const name = document.getElementById('regName').value.trim();
@@ -493,8 +489,8 @@
       const pass = document.getElementById('regPass').value;
       const passConfirm = document.getElementById('regPassConfirm').value;
 
-      if (!name) return showToast('Укажите ваше имя!');
-      if (pass !== passConfirm) return showToast('Ошибка: Пароли не совпадают!');
+      if (!name) return showToast('Укажите имя!');
+      if (pass !== passConfirm) return showToast('Пароли не совпадают!');
       if (pass.length < 6) return showToast('Пароль должен быть от 6 символов!');
 
       createUserWithEmailAndPassword(auth, email, pass)
@@ -509,7 +505,7 @@
           });
         })
         .catch((error) => {
-          if (error.code === 'auth/email-already-in-use') showToast('Этот Email уже занят!');
+          if (error.code === 'auth/email-already-in-use') showToast('Этот Email занят!');
           else showToast(`Ошибка: ${error.message}`);
         });
     });
@@ -534,6 +530,14 @@
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
       const activeTab = document.getElementById(tabId);
       if(activeTab) activeTab.classList.add('active');
+
+      // Управление подсветкой активного элемента в мобильном меню
+      document.querySelectorAll('.mobile-nav-item').forEach(el => el.classList.remove('active'));
+      if (tabId === 'home') {
+        document.getElementById('mNavHome').classList.add('active');
+      } else if (tabId === 'auth-tab') {
+        // Убираем подсветку со всех, если зашли в профиль
+      }
     }
 
     window.toggleAuthForms = function(showLogin) {
@@ -542,6 +546,12 @@
     }
 
     window.openModal = function(id) {
+      // Подсвечиваем соответствующую иконку в таб-баре при открытии окна
+      document.querySelectorAll('.mobile-nav-item').forEach(el => el.classList.remove('active'));
+      if (id === 'trainingModal') document.getElementById('mNavTrain').classList.add('active');
+      if (id === 'nutritionModal') document.getElementById('mNavNutr').classList.add('active');
+      if (id === 'bodyModal') document.getElementById('mNavBody').classList.add('active');
+
       const modal = document.getElementById(id);
       modal.style.display = 'flex';
       setTimeout(() => modal.classList.add('show'), 10);
@@ -570,6 +580,12 @@
       const modal = document.getElementById(id);
       modal.classList.remove('show');
       setTimeout(() => modal.style.display = 'none', 250);
+      // Возвращаем фокус на главную в таббаре при закрытии модалки
+      const activeTab = document.querySelector('.tab-content.active');
+      if (activeTab && activeTab.id === 'home') {
+        document.querySelectorAll('.mobile-nav-item').forEach(el => el.classList.remove('active'));
+        document.getElementById('mNavHome').classList.add('active');
+      }
     }
     window.closeModalOnBackdrop = function(e) {
       if(e.target.classList.contains('modal')) closeModal(e.target.id);

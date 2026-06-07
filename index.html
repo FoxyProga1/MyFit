@@ -78,7 +78,7 @@
     .donut::before { content: ""; position: absolute; inset: 40px; background: var(--bg); border-radius: 50%; }
     .donut-value { position: relative; font-size: 36px; font-weight: bold; color: #111; z-index: 2; }
 
-    /* Общая стилизация зон для графиков (Питание и Тренировки) */
+    /* Общая стилизация зон для графиков */
     .chart-area { position: relative; height: 220px; padding: 20px 10px 40px 40px; background: #fff; border-radius: 12px; border: 1px solid #ddd; margin-bottom: 20px; }
     .grid-line { position: absolute; left: 40px; right: 10px; height: 1px; background: #eee; }
     .grid-line span { position: absolute; left: -35px; top: -8px; font-size: 11px; }
@@ -88,12 +88,10 @@
     .bar-group { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; }
     .bar { width: 100%; border-radius: 6px 6px 0 0; transition: height 0.25s; min-height: 2px; }
     
-    /* Цвета столбцов питания */
     .bar.breakfast { background: #a9d5b3; } .bar.lunch { background: #a8cbd9; } .bar.dinner { background: #91aee8; }
-    /* Цвета столбцов тренировок (Неделя) */
     .bar.workout-day { background: #6175ca; }
     
-    .bar-label { margin-top: 6px; font-size: 11px; text-transform: short; white-space: nowrap; }
+    .bar-label { margin-top: 6px; font-size: 11px; white-space: nowrap; }
     .bar-value { margin-bottom: 4px; font-size: 11px; font-weight: bold; color: var(--blue-dark); }
 
     /* Виджет ИМТ */
@@ -121,7 +119,7 @@
       <button class="nav-link" onclick="openModal('trainingModal')">Дневник тренировок</button>
       <button class="nav-link" onclick="openModal('nutritionModal')">Дневник питания</button>
       <button class="nav-link" onclick="openModal('bodyModal')">Оценка тела</button>
-      <button class="login-button" id="headerAuthBtn" onclick="switchTab('auth-tab')">Вход / Регистрация</button>
+      <button class="login-button" id="headerAuthBtn" onclick="handleHeaderAuthClick()">Вход / Регистрация</button>
     </nav>
   </header>
 
@@ -152,8 +150,8 @@
   <section class="tab-content" id="auth-tab">
     <div class="auth-card" id="login-block">
       <h2>Вход в систему</h2>
-      <form class="auth-form" onsubmit="handleAuth(event, 'login')">
-        <input type="text" id="loginUser" placeholder="Логин или Email" required />
+      <form class="auth-form" id="loginForm">
+        <input type="email" id="loginEmail" placeholder="Ваш Email" required />
         <input type="password" id="loginPass" placeholder="Пароль" required />
         <button type="submit">Войти</button>
       </form>
@@ -162,11 +160,9 @@
 
     <div class="auth-card" id="register-block" style="display: none;">
       <h2>Регистрация</h2>
-      <form class="auth-form" onsubmit="handleAuth(event, 'register')">
-        <input type="text" id="regName" placeholder="Ваше имя" required />
-        <input type="text" id="regUser" placeholder="Придумайте логин" required />
-        <input type="email" id="regEmail" placeholder="Email" required />
-        <input type="password" id="regPass" placeholder="Пароль" required />
+      <form class="auth-form" id="registerForm">
+        <input type="email" id="regEmail" placeholder="Укажите Email" required />
+        <input type="password" id="regPass" placeholder="Придумайте пароль (от 6 символов)" required />
         <input type="password" id="regPassConfirm" placeholder="Повторите пароль" required />
         <button type="submit">Создать аккаунт</button>
       </form>
@@ -195,9 +191,9 @@
           </div>
         </div>
       </div>
-      <div>
+      <div id="trainingContentBox">
         <div class="toolbar">
-          <input id="trainingNameInput" type="text" placeholder="Упражнение (напр. Бег)" style="width:140px;" />
+          <input id="trainingNameInput" type="text" placeholder="Упражнение" style="width:140px;" />
           <input id="trainingValueInput" type="number" placeholder="Кол-во" style="width:80px;" />
           <select id="trainingUnitInput">
             <option value="шаги">шаги</option>
@@ -207,7 +203,6 @@
           <button onclick="addTraining()">+</button>
           <button onclick="clearData('training')">Очистить</button>
         </div>
-        <p class="hint">Редактировать значения и единицы (шаги/км) можно прямо в таблице.</p>
         <table class="section-table" id="trainingTable">
           <thead><tr><th>Активность</th><th>Результат</th><th>Ед. изм.</th><th>Дата</th></tr></thead>
           <tbody></tbody>
@@ -233,7 +228,7 @@
         </div>
         <p class="hint" id="nutritionSelectedDate" style="margin-top:10px; font-weight:bold;"></p>
       </div>
-      <div>
+      <div id="nutritionContentBox">
         <div class="toolbar">
           <input id="breakfastInput" type="number" placeholder="Завтрак" style="width:75px;" />
           <input id="lunchInput" type="number" placeholder="Обед" style="width:75px;" />
@@ -260,9 +255,8 @@
           <div class="bmi-value" id="bmiValue">--.-</div>
           <div class="bmi-status" id="bmiStatus">Нет данных</div>
         </div>
-        <p class="hint" style="margin-top:15px; text-align:left;">ИМТ рассчитывается автоматически на основе вашей последней записи (Вес и Рост).</p>
       </div>
-      <div>
+      <div id="bodyContentBox">
         <div class="toolbar">
           <input id="currentWeightInput" type="number" step="0.1" placeholder="Вес (кг)" style="width:85px;" />
           <input id="currentHeightInput" type="number" step="1" placeholder="Рост (см)" style="width:85px;" />
@@ -285,6 +279,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyA5O19ED6vp0RwWSwJLZ5u4lqXwyfQBA3Q",
@@ -298,6 +293,10 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
+    const auth = getAuth(app);
+
+    let currentUser = null;
+    let dbListenerRef = null;
 
     let state = {
       training: [],
@@ -306,27 +305,109 @@
       selectedNutritionIndex: 0
     };
 
-    onValue(ref(db, 'fitData'), (snapshot) => {
-      const data = snapshot.val();
-      if (data) {
-        state.training = data.training || [];
-        state.nutrition = data.nutrition || [];
-        state.body = data.body || [];
+    // Слушатель изменения состояния авторизации
+    onAuthStateChanged(auth, (user) => {
+      currentUser = user;
+      const headerBtn = document.getElementById('headerAuthBtn');
+      
+      if (user) {
+        // Пользователь залогинен
+        headerBtn.textContent = `Выйти (${user.email.split('@')[0]})`;
+        headerBtn.style.background = "#ffcccc";
+        headerBtn.style.borderColor = "#ff9999";
+        
+        // Подключаем персональную ветку данных пользователя: users/uid/fitData
+        const userDbRef = ref(db, `users/${user.uid}/fitData`);
+        
+        dbListenerRef = onValue(userDbRef, (snapshot) => {
+          const data = snapshot.val();
+          if (data) {
+            state.training = data.training || [];
+            state.nutrition = data.nutrition || [];
+            state.body = data.body || [];
+          } else {
+            state.training = [];
+            state.nutrition = [];
+            state.body = [];
+          }
+          renderAll();
+        });
       } else {
+        // Пользователь вышел
+        headerBtn.textContent = "Вход / Регистрация";
+        headerBtn.style.background = "#d6f1dc";
+        headerBtn.style.borderColor = "#6175ca";
+        
         state.training = [];
         state.nutrition = [];
         state.body = [];
+        state.selectedNutritionIndex = 0;
+        
+        renderAll();
+        showToast("Войдите в систему для просмотра и редактирования данных.");
       }
-      renderAll();
     });
 
+    // Синхронизация данных с Firebase в ветку конкретного пользователя
     function syncWithFirebase() {
-      set(ref(db, 'fitData'), {
+      if (!currentUser) return showToast("Ошибка: Вы не авторизованы!");
+      set(ref(db, `users/${currentUser.uid}/fitData`), {
         training: state.training,
         nutrition: state.nutrition,
         body: state.body
       }).catch(err => showToast("Ошибка синхронизации с облаком"));
     }
+
+    // Обработка клика по кнопке в Хедере
+    window.handleHeaderAuthClick = function() {
+      if (currentUser) {
+        signOut(auth).then(() => {
+          showToast("Вы успешно вышли из аккаунта.");
+          switchTab('home');
+        }).catch(err => showToast("Ошибка при выходе"));
+      } else {
+        switchTab('auth-tab');
+      }
+    }
+
+    // Регистрация через Firebase Auth
+    document.getElementById('registerForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const email = document.getElementById('regEmail').value.trim();
+      const pass = document.getElementById('regPass').value;
+      const passConfirm = document.getElementById('regPassConfirm').value;
+
+      if (pass !== passConfirm) return showToast('Ошибка: Пароли не совпадают!');
+      if (pass.length < 6) return showToast('Пароль должен быть не менее 6 символов!');
+
+      createUserWithEmailAndPassword(auth, email, pass)
+        .then((userCredential) => {
+          showToast('Регистрация успешна! Добро пожаловать.');
+          switchTab('home');
+          document.getElementById('registerForm').reset();
+        })
+        .catch((error) => {
+          if (error.code === 'auth/email-already-in-use') showToast('Этот Email уже используется!');
+          else showToast(`Ошибка регистрации: ${error.message}`);
+        });
+    });
+
+    // Вход через Firebase Auth
+    document.getElementById('loginForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value.trim();
+      const pass = document.getElementById('loginPass').value;
+
+      signInWithEmailAndPassword(auth, email, pass)
+        .then((userCredential) => {
+          showToast('Успешный вход в систему!');
+          switchTab('home');
+          document.getElementById('loginForm').reset();
+        })
+        .catch((error) => {
+          showToast('Неверный Email или пароль!');
+        });
+    });
 
     window.switchTab = function(tabId) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
@@ -339,22 +420,28 @@
       document.getElementById('register-block').style.display = showLogin ? 'none' : 'block';
     }
 
-    window.handleAuth = function(event, type) {
-      event.preventDefault();
-      if (type === 'register') {
-        const pass = document.getElementById('regPass').value;
-        if (pass !== document.getElementById('regPassConfirm').value) return showToast('Ошибка: Пароли не совпадают!');
-        showToast('Регистрация успешна!');
-      } else {
-        showToast('Вы успешно вошли.');
-      }
-      switchTab('home');
-    }
-
+    // Управление модальными окнами и заглушками для неавторизованных
     window.openModal = function(id) {
       const modal = document.getElementById(id);
       modal.style.display = 'flex';
       setTimeout(() => modal.classList.add('show'), 10);
+      
+      const contentBoxMap = {
+        'trainingModal': 'trainingContentBox',
+        'nutritionModal': 'nutritionContentBox',
+        'bodyModal': 'bodyContentBox'
+      };
+
+      const contentBox = document.getElementById(contentBoxMap[id]);
+      if (contentBox) {
+        if (!currentUser) {
+          contentBox.style.opacity = '0.3';
+          contentBox.style.pointerEvents = 'none';
+        } else {
+          contentBox.style.opacity = '1';
+          contentBox.style.pointerEvents = 'all';
+        }
+      }
       renderAll();
     }
     window.closeModal = function(id) {
@@ -376,63 +463,46 @@
 
     function createCell(text, onSave) {
       const el = document.createElement('div'); el.className = 'editable-cell';
-      el.contentEditable = true; el.textContent = text || '';
+      el.contentEditable = currentUser ? true : false; 
+      el.textContent = text || '';
       el.addEventListener('blur', () => onSave(el.textContent.trim()));
       el.addEventListener('keydown', e => { if(e.key === 'Enter') { e.preventDefault(); el.blur(); } });
       return el;
     }
 
-    // Обновление графиков, ИМТ и рабочей недельной диаграммы
     function updateCharts() {
-      // 1. Расчет шагов и км для кругового прогресс-бара
       let totalStepsCalculated = 0;
-      
-      // Массив для хранения шагов по дням недели (индекс 0 - Пн, ..., 6 - Вс)
       let weeklyStepsDistribution = [0, 0, 0, 0, 0, 0, 0];
 
       if (state.training && state.training.length) {
         state.training.forEach(row => {
           let valueInSteps = pNum(row.value);
-          // Конвертируем километры в шаги для графика (1 км = 1250 шагов)
-          if (row.unit === 'км') {
-            valueInSteps = Math.round(valueInSteps * 1250);
-          }
+          if (row.unit === 'км') valueInSteps = Math.round(valueInSteps * 1250);
           totalStepsCalculated += valueInSteps;
 
-          // Группируем по дням недели для столбчатой диаграммы
           if (row.date) {
             const dateObj = new Date(row.date);
-            let dayOfWeek = dateObj.getDay(); // 0 - Вс, 1 - Пн, ..., 6 - Сб
-            let normalizedDay = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Делаем 0 - Пн, ..., 6 - Вс
-            if (!isNaN(normalizedDay)) {
-              weeklyStepsDistribution[normalizedDay] += valueInSteps;
-            }
+            let dayOfWeek = dateObj.getDay(); 
+            let normalizedDay = dayOfWeek === 0 ? 6 : dayOfWeek - 1; 
+            if (!isNaN(normalizedDay)) weeklyStepsDistribution[normalizedDay] += valueInSteps;
           }
         });
       }
 
-      // Обновляем круговой прогресс
       const percent = Math.min(100, Math.round((totalStepsCalculated / 32000) * 100));
       const donutEl = document.getElementById('trainingDonut');
       if (donutEl) donutEl.style.background = `conic-gradient(var(--blue-dark) ${percent * 3.6}deg, #d5d5d5 0deg)`;
       const percentEl = document.getElementById('trainingPercent');
       if (percentEl) percentEl.textContent = `${percent}%`;
 
-      // Обновляем СТОЛБЧАТУЮ ДИАГРАММУ по дням недели (Максимум шкалы сделаем 8000 шагов)
       for (let i = 0; i < 7; i++) {
         const dayValue = weeklyStepsDistribution[i];
         const valEl = document.getElementById(`wd-${i+1}`);
         const barEl = document.getElementById(`wb-${i+1}`);
-        
         if (valEl) valEl.textContent = dayValue >= 1000 ? (dayValue/1000).toFixed(1) + 'к' : dayValue;
-        if (barEl) {
-          // Максимальная высота столбца 110px при 8000+ шагах в день
-          const barHeight = Math.max(2, Math.min(110, (dayValue / 8000) * 110));
-          barEl.style.height = `${barHeight}px`;
-        }
+        if (barEl) barEl.style.height = `${Math.max(2, Math.min(110, (dayValue / 8000) * 110))}px`;
       }
 
-      // 2. Питание
       const row = state.nutrition[state.selectedNutritionIndex] || { breakfast: 0, lunch: 0, dinner: 0, date: '' };
       ['breakfast', 'lunch', 'dinner'].forEach(k => {
         const val = pNum(row[k]);
@@ -444,7 +514,6 @@
       const nutrDateEl = document.getElementById('nutritionSelectedDate');
       if (nutrDateEl) nutrDateEl.textContent = row.date ? `Данные за ${fmtDate(row.date)}` : 'Выберите дату';
 
-      // 3. ИМТ
       if (state.body && state.body.length > 0) {
         const lastBody = state.body[state.body.length - 1];
         const w = pNum(lastBody.current);
@@ -486,7 +555,7 @@
         });
         const btn = document.createElement('button'); btn.className = `date-pill ${idx === state.selectedNutritionIndex ? 'active' : ''}`;
         btn.textContent = fmtDate(row.date) || '---';
-        btn.onclick = () => { state.selectedNutritionIndex = idx; renderAll(); };
+        btn.onclick = () => { if(currentUser) { state.selectedNutritionIndex = idx; renderAll(); } };
         tr.insertCell().appendChild(btn);
         return tr;
       });
@@ -504,45 +573,47 @@
     }
 
     window.addTraining = function() {
+      if(!currentUser) return;
       const name = document.getElementById('trainingNameInput').value.trim();
       const value = document.getElementById('trainingValueInput').value.trim();
       const unit = document.getElementById('trainingUnitInput').value;
       const date = document.getElementById('trainingDateInput').value;
       if(!name && !value && !date) return showToast('Заполните поля');
       state.training.push({ name, value, unit, date }); syncWithFirebase();
-      showToast('Тренировка успешно добавлена');
     }
 
     window.addNutrition = function() {
+      if(!currentUser) return;
       const breakfast = document.getElementById('breakfastInput').value.trim();
       const lunch = document.getElementById('lunchInput').value.trim();
       const dinner = document.getElementById('dinnerInput').value.trim();
       const date = document.getElementById('nutritionDateInput').value;
       state.nutrition.push({ breakfast, lunch, dinner, date });
       state.selectedNutritionIndex = state.nutrition.length - 1;
-      syncWithFirebase(); showToast('Данные добавлены');
+      syncWithFirebase();
     }
 
     window.addBody = function() {
+      if(!currentUser) return;
       const current = document.getElementById('currentWeightInput').value.trim();
       const height = document.getElementById('currentHeightInput').value.trim();
       const target = document.getElementById('targetWeightInput').value.trim();
       const date = document.getElementById('bodyDateInput').value;
       state.body.push({ current, height, target, date }); syncWithFirebase();
-      showToast('Запись веса и роста добавлена');
     }
 
     window.removeLast = function(key) {
-      if(!state[key].length) return;
+      if(!currentUser || !state[key].length) return;
       state[key].pop();
       if(key === 'nutrition') state.selectedNutritionIndex = Math.max(0, state.nutrition.length - 1);
-      syncWithFirebase(); showToast('Строка удалена');
+      syncWithFirebase();
     }
 
     window.clearData = function(key) {
+      if(!currentUser) return;
       state[key] = [];
       if(key === 'nutrition') state.selectedNutritionIndex = 0;
-      syncWithFirebase(); showToast('Таблица очищена');
+      syncWithFirebase();
     }
   </script>
 </body>

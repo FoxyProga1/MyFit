@@ -88,6 +88,11 @@
     .bar-label { margin-top: 6px; font-size: 13px; }
     .bar-value { margin-bottom: 4px; font-size: 13px; font-weight: bold; color: var(--blue-dark); }
 
+    /* Виджет ИМТ */
+    .bmi-display { background: #fff; padding: 20px; border-radius: 16px; border: 2px solid rgba(87,114,204,0.15); margin-top: 15px; text-align: center; }
+    .bmi-value { font-size: 36px; font-weight: bold; color: var(--blue-dark); margin: 5px 0; }
+    .bmi-status { font-size: 16px; font-weight: bold; color: #5f6d91; }
+
     /* Авторизация (Карточка) */
     .auth-card { background: #fff; border-radius: 24px; padding: 35px; border: 2px solid rgba(87,114,204,0.15); box-shadow: 0 10px 25px rgba(0,0,0,0.03); }
     .auth-card h2 { margin-bottom: 20px; color: var(--blue); font-family: Georgia, serif; text-align: center; }
@@ -130,7 +135,7 @@
         </div>
         <div class="feature-card" onclick="openModal('bodyModal')">
           <h3>⚖️ Замеры тела</h3>
-          <p>Мониторинг изменений веса и калькулятор ИМТ.</p>
+          <p>Мониторинг изменений веса, роста и калькулятор ИМТ.</p>
         </div>
       </div>
     </div>
@@ -148,7 +153,7 @@
     </div>
 
     <div class="auth-card" id="register-block" style="display: none;">
-      <h2>Регистрация</h2>
+      <h2>Registration</h2>
       <form class="auth-form" onsubmit="handleAuth(event, 'register')">
         <input type="text" id="regName" placeholder="Ваше имя" required />
         <input type="text" id="regUser" placeholder="Придумайте логин" required />
@@ -224,19 +229,24 @@
     <div class="modal-box">
       <span class="close-modal" onclick="closeModal('bodyModal')">&times;</span>
       <div class="pane-left">
-        <img src="график(1).png" alt="ИМТ" style="width:100%; max-width:280px;" />
-        <p class="hint" style="margin-top:10px; text-align:left;">Формула ИМТ: вес (кг) / рост (м)².<br>Помогает оценить соответствие массы тела вашему росту.</p>
+        <div class="bmi-display">
+          <h4>Ваш Индекс Массы Тела</h4>
+          <div class="bmi-value" id="bmiValue">--.-</div>
+          <div class="bmi-status" id="bmiStatus">Нет данных</div>
+        </div>
+        <p class="hint" style="margin-top:15px; text-align:left;">ИМТ рассчитывается автоматически на основе вашей последней записи (Вес и Рост).</p>
       </div>
       <div>
         <div class="toolbar">
-          <input id="currentWeightInput" type="number" step="0.1" placeholder="Вес (кг)" style="width:90px;" />
-          <input id="targetWeightInput" type="number" step="0.1" placeholder="Цель (кг)" style="width:90px;" />
+          <input id="currentWeightInput" type="number" step="0.1" placeholder="Вес (кг)" style="width:85px;" />
+          <input id="currentHeightInput" type="number" step="1" placeholder="Рост (см)" style="width:85px;" />
+          <input id="targetWeightInput" type="number" step="0.1" placeholder="Цель (кг)" style="width:85px;" />
           <input id="bodyDateInput" type="date" />
           <button onclick="addBody()">+</button>
           <button onclick="clearData('body')">Очистить</button>
         </div>
         <table class="section-table" id="bodyTable">
-          <thead><tr><th>Текущий вес</th><th>Желаемый</th><th>Дата</th></tr></thead>
+          <thead><tr><th>Вес (кг)</th><th>Рост (см)</th><th>Желаемый (кг)</th><th>Дата</th></tr></thead>
           <tbody></tbody>
         </table>
         <div class="row-actions"><button onclick="removeLast('body')">Удалить последнюю строку</button></div>
@@ -250,7 +260,6 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-    // Конфигурация вашего веб-приложения
     const firebaseConfig = {
       apiKey: "AIzaSyA5O19ED6vp0RwWSwJLZ5u4lqXwyfQBA3Q",
       authDomain: "fitstats-5ba4e.firebaseapp.com",
@@ -261,11 +270,9 @@
       measurementId: "G-KLXS4VTNFF"
     };
 
-    // Инициализация Firebase и Realtime Database
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    // Локальное состояние приложения
     let state = {
       training: [],
       nutrition: [],
@@ -281,7 +288,6 @@
         state.nutrition = data.nutrition || [];
         state.body = data.body || [];
       } else {
-        // Если база пуста, ставим дефолтные структуры
         state.training = [];
         state.nutrition = [];
         state.body = [];
@@ -289,7 +295,6 @@
       renderAll();
     });
 
-    // Функция сохранения синхронизированного состояния в Firebase
     function syncWithFirebase() {
       set(ref(db, 'fitData'), {
         training: state.training,
@@ -298,7 +303,6 @@
       }).catch(err => showToast("Ошибка синхронизации с облаком"));
     }
 
-    // Навигация и табы
     window.switchTab = function(tabId) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
       const activeTab = document.getElementById(tabId);
@@ -322,7 +326,6 @@
       switchTab('home');
     }
 
-    // Управление модальными окнами
     window.openModal = function(id) {
       const modal = document.getElementById(id);
       modal.style.display = 'flex';
@@ -338,13 +341,13 @@
       if(e.target.classList.contains('modal')) closeModal(e.target.id);
     }
 
-    // Уведомления и утилиты
     window.showToast = function(msg) {
       const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show');
       clearTimeout(window.tTimer); window.tTimer = setTimeout(() => t.classList.remove('show'), 2500);
     }
+    
     function fmtDate(d) { if(!d) return ''; const p = d.split('-'); return p.length===3 ? `${p[2]}.${p[1]}.${p[0]}` : d; }
-    function pNum(v) { return parseFloat(String(v).replace(',', '.')) || 0; }
+    function pNum(v) { return parseFloat(String(v).replace(/[^\d.]/g, '').replace(',', '.')) || 0; }
 
     function createCell(text, onSave) {
       const el = document.createElement('div'); el.className = 'editable-cell';
@@ -354,20 +357,52 @@
       return el;
     }
 
-    // Логика перерисовки графиков
+    // Обновление графиков и ИМТ
     function updateCharts() {
-      const totalSteps = state.training.reduce((s, r) => s + pNum(r.value), 0);
+      // 1. Исправление круга тренировок
+      const totalSteps = (state.training && state.training.length) 
+        ? state.training.reduce((s, r) => s + pNum(r.value), 0) 
+        : 0;
       const percent = Math.min(100, Math.round((totalSteps / 32000) * 100));
-      document.getElementById('trainingDonut').style.background = `conic-gradient(var(--blue-dark) ${percent * 3.6}deg, #d5d5d5 0deg)`;
-      document.getElementById('trainingPercent').textContent = `${percent}%`;
+      const donutEl = document.getElementById('trainingDonut');
+      if (donutEl) {
+        donutEl.style.background = `conic-gradient(var(--blue-dark) ${percent * 3.6}deg, #d5d5d5 0deg)`;
+      }
+      const percentEl = document.getElementById('trainingPercent');
+      if (percentEl) percentEl.textContent = `${percent}%`;
 
+      // 2. Питание
       const row = state.nutrition[state.selectedNutritionIndex] || { breakfast: 0, lunch: 0, dinner: 0, date: '' };
       ['breakfast', 'lunch', 'dinner'].forEach(k => {
         const val = pNum(row[k]);
-        document.getElementById(`${k}Value`).textContent = val;
-        document.getElementById(`${k}Bar`).style.height = `${Math.max(2, Math.min(260, (val / 900) * 260))}px`;
+        const valEl = document.getElementById(`${k}Value`);
+        const barEl = document.getElementById(`${k}Bar`);
+        if (valEl) valEl.textContent = val;
+        if (barEl) barEl.style.height = `${Math.max(2, Math.min(260, (val / 900) * 260))}px`;
       });
-      document.getElementById('nutritionSelectedDate').textContent = row.date ? `Данные за ${fmtDate(row.date)}` : 'Выберите дату';
+      const nutrDateEl = document.getElementById('nutritionSelectedDate');
+      if (nutrDateEl) nutrDateEl.textContent = row.date ? `Данные за ${fmtDate(row.date)}` : 'Выберите дату';
+
+      // 3. Динамический расчет ИМТ на основе Роста и Веса
+      if (state.body && state.body.length > 0) {
+        const lastBody = state.body[state.body.length - 1];
+        const w = pNum(lastBody.current);
+        const h = pNum(lastBody.height) / 100; // перевод см в метры
+        
+        if (w > 0 && h > 0) {
+          const bmi = (w / (h * h)).toFixed(1);
+          document.getElementById('bmiValue').textContent = bmi;
+          
+          let status = "Норма";
+          if (bmi < 18.5) status = "Дефицит массы";
+          else if (bmi >= 25 && bmi < 30) status = "Избыточный вес";
+          else if (bmi >= 30) status = "Ожирение";
+          document.getElementById('bmiStatus').textContent = status;
+        }
+      } else {
+        document.getElementById('bmiValue').textContent = "--.-";
+        document.getElementById('bmiStatus').textContent = "Нет данных";
+      }
     }
 
     function renderTable(id, callback) {
@@ -399,6 +434,7 @@
       renderTable('body', (row, idx) => {
         const tr = document.createElement('tr');
         tr.insertCell().appendChild(createCell(row.current, v => { state.body[idx].current = v; syncWithFirebase(); }));
+        tr.insertCell().appendChild(createCell(row.height, v => { state.body[idx].height = v; syncWithFirebase(); }));
         tr.insertCell().appendChild(createCell(row.target, v => { state.body[idx].target = v; syncWithFirebase(); }));
         tr.insertCell().appendChild(createCell(fmtDate(row.date), v => { state.body[idx].date = v; syncWithFirebase(); }));
         return tr;
@@ -407,7 +443,6 @@
       updateCharts();
     }
 
-    // Добавление строк и синхронизация
     window.addTraining = function() {
       const name = document.getElementById('trainingNameInput').value.trim();
       const value = document.getElementById('trainingValueInput').value.trim();
@@ -429,10 +464,11 @@
 
     window.addBody = function() {
       const current = document.getElementById('currentWeightInput').value.trim();
+      const height = document.getElementById('currentHeightInput').value.trim();
       const target = document.getElementById('targetWeightInput').value.trim();
       const date = document.getElementById('bodyDateInput').value;
-      state.body.push({ current, target, date }); syncWithFirebase();
-      showToast('Запись веса добавлена');
+      state.body.push({ current, height, target, date }); syncWithFirebase();
+      showToast('Запись веса и роста добавлена');
     }
 
     window.removeLast = function(key) {

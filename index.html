@@ -15,7 +15,6 @@
       --muted: #99a7bd;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    /* ИСПРАВЛЕНО: Убрано min-width: 1200px, ломавшее отображение на телефонах */
     body { background: var(--bg); color: var(--text); font-family: Arial, sans-serif; padding-bottom: 60px; overflow-x: hidden; }
     a { color: inherit; text-decoration: none; }
 
@@ -38,7 +37,7 @@
     .login-button { border: 3px solid #6175ca; background: #d6f1dc; font-weight: bold; }
     .nav-link:hover, .login-button:hover { transform: translateY(-1px); opacity: 0.9; }
 
-    /* ДОБАВЛЕНО: Кнопка бургер-меню (скрыта на компьютерах) */
+    /* Кнопка бургер-меню */
     .burger-menu-btn {
       display: none;
       flex-direction: column;
@@ -48,7 +47,7 @@
       background: transparent;
       border: none;
       cursor: pointer;
-      z-index: 150;
+      z-index: 130; /* ИСПРАВЛЕНО: Самый верхний уровень, чтобы бургер всегда кликался */
     }
     .burger-menu-btn span {
       display: block;
@@ -58,15 +57,15 @@
       border-radius: 3px;
       transition: all 0.3s ease;
     }
-    /* Анимация трансформации бургера в крестик при открытии */
     .burger-menu-btn.open span:nth-child(1) { transform: translateY(9px) rotate(45deg); }
     .burger-menu-btn.open span:nth-child(2) { opacity: 0; }
     .burger-menu-btn.open span:nth-child(3) { transform: translateY(-9px) rotate(-45deg); }
 
-    /* ДОБАВЛЕНО: Затемнение заднего фона при открытии меню */
+    /* Затемнение заднего фона */
     .nav-overlay {
       position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-      background: rgba(0, 0, 0, 0.4); z-index: 110;
+      background: rgba(0, 0, 0, 0.4); 
+      z-index: 110; /* ИСПРАВЛЕНО: Ниже, чем само меню */
       opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
     }
     .nav-overlay.show { opacity: 1; pointer-events: all; }
@@ -102,7 +101,7 @@
     .row-actions button { background: #7e91df; margin-top: 10px; width: 100%; }
     .hint { font-size: 13px; color: #5f6d91; margin-bottom: 10px; }
 
-    /* ДОБАВЛЕНО: Адаптивные контейнеры для таблиц, предотвращающие растягивание экрана */
+    /* Адаптивные контейнеры для таблиц */
     .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 10px; border-radius: 8px; border: 1px solid rgba(87,114,204,0.3); }
     .section-table { width: 100%; border-collapse: collapse; font-size: 16px; background: #fff; overflow: hidden; }
     .section-table th, .section-table td { border: 1px solid rgba(87,114,204,0.3); padding: 12px; text-align: center; white-space: nowrap; }
@@ -143,15 +142,14 @@
     .toast { position: fixed; right: 20px; bottom: 20px; z-index: 300; background: rgba(55, 75, 159, 0.95); color: white; padding: 12px 20px; border-radius: 10px; font-size: 14px; opacity: 0; transform: translateY(10px); pointer-events: none; transition: 0.25s; }
     .toast.show { opacity: 1; transform: translateY(0); }
 
-    /* ДОБАВЛЕНО: Адаптивные медиа-запросы для мобильных устройств */
+    /* Адаптивные медиа-запросы для мобильных устройств */
     @media (max-width: 992px) {
       .site-header { padding: 15px 20px; min-height: 80px; }
       .brand-title { font-size: 32px; }
       
-      /* Активируем кнопку-бургер */
       .burger-menu-btn { display: flex; }
 
-      /* Превращаем навигацию в выезжающую боковую панель */
+      /* Выезжающая боковая панель */
       .nav {
         position: fixed;
         top: 0;
@@ -160,13 +158,13 @@
         height: 100vh;
         background: #fff;
         box-shadow: -5px 0 15px rgba(0,0,0,0.1);
-        z-index: 120;
         flex-direction: column;
         align-items: stretch;
         justify-content: flex-start;
         padding: 80px 20px 20px 20px;
         gap: 15px;
         transition: right 0.3s ease-in-out;
+        z-index: 120; /* ИСПРАВЛЕНО: Меню теперь поверх оверлея затемнения */
       }
       .nav.open { right: 0; }
 
@@ -409,7 +407,6 @@
       selectedNutritionIndex: 0
     };
 
-    // --- ДОБАВЛЕНО: Скрипты открытия и анимации бургер-меню ---
     window.toggleMobileMenu = function(flag) {
       const burgerBtn = document.getElementById('burgerBtn');
       const mainNav = document.getElementById('mainNav');
@@ -428,7 +425,6 @@
       }
     }
 
-    // Специфический обработчик, закрывающий шторку перед вызовом модального окна
     window.handleMenuAction = function(actionType) {
       window.toggleMobileMenu(false); 
       if (actionType === 'auth') {
@@ -438,7 +434,6 @@
       }
     }
 
-    // Слушатель изменения состояния авторизации
     onAuthStateChanged(auth, (user) => {
       currentUser = user;
       const headerBtn = document.getElementById('headerAuthBtn');

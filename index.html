@@ -276,7 +276,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, set, onValue, get, child } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, set, onValue, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
     const firebaseConfig = {
@@ -303,29 +303,18 @@
       selectedNutritionIndex: 0
     };
 
-    // Слушатель состояния авторизации
+    // Слушатель изменения состояния авторизации
     onAuthStateChanged(auth, (user) => {
       currentUser = user;
       const headerBtn = document.getElementById('headerAuthBtn');
       
       if (user) {
-        // Подгружаем имя профиля напрямую из Firebase Realtime Database
-        get(ref(db, `users/${user.uid}/profile`)).then((snapshot) => {
-          let userName = "Пользователь";
-          if (snapshot.exists() && snapshot.val().name) {
-            userName = snapshot.val().name;
-          } else {
-            userName = user.email.split('@')[0];
-          }
-          headerBtn.textContent = `Выйти (${userName})`;
-        }).catch(() => {
-          headerBtn.textContent = `Выйти (${user.email.split('@')[0]})`;
-        });
-
+        // ВОЗВРАЩЕНО: Теперь на кнопке всегда выводится точный Email пользователя из Firebase Auth
+        headerBtn.textContent = `Выйти (${user.email})`;
         headerBtn.style.background = "#ffcccc";
         headerBtn.style.borderColor = "#ff9999";
         
-        // Слушаем ветку дневников (fitData) конкретного аккаунта
+        // Слушаем дневники в ветке fitData текущего UID аккаунта
         const userDbRef = ref(db, `users/${user.uid}/fitData`);
         dbListenerRef = onValue(userDbRef, (snapshot) => {
           const data = snapshot.val();
@@ -341,7 +330,7 @@
           renderAll();
         });
       } else {
-        // Если никто не авторизован
+        // Когда пользователь вышел
         headerBtn.textContent = "Вход / Регистрация";
         headerBtn.style.background = "#d6f1dc";
         headerBtn.style.borderColor = "#6175ca";
@@ -355,7 +344,7 @@
       }
     });
 
-    // Синхронизация данных текущего аккаунта
+    // Синхронизация данных с Firebase
     function syncWithFirebase() {
       if (!currentUser) return showToast("Ошибка: Вы не авторизованы!");
       set(ref(db, `users/${currentUser.uid}/fitData`), {
@@ -391,7 +380,7 @@
       createUserWithEmailAndPassword(auth, email, pass)
         .then((userCredential) => {
           const uid = userCredential.user.uid;
-          // Сохраняем имя и данные аккаунта в ветку users/uid/profile
+          // Сохраняем имя и почту в ветку профиля аккаунта
           set(ref(db, `users/${uid}/profile`), {
             name: name,
             email: email,

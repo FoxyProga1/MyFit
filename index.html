@@ -24,10 +24,11 @@
       align-items: center; justify-content: space-between; padding: 15px 40px;
       background: linear-gradient(90deg, var(--mint), #b7d8e2, var(--light-blue));
       border-bottom: 1px solid rgba(86, 109, 196, 0.15);
-      flex-wrap: wrap; gap: 15px;
     }
     .brand-title { font-size: 42px; font-weight: 700; color: var(--blue); font-family: Georgia, serif; }
-    .nav { display: flex; gap: 15px; align-items: center; flex-wrap: wrap; }
+    
+    /* Десктопная навигация */
+    .nav { display: flex; gap: 15px; align-items: center; }
     .nav-link, .login-button {
       padding: 12px 20px; text-align: center; font-size: 18px; color: var(--blue);
       border: 2px solid transparent; cursor: pointer; background: none; border-radius: 12px; transition: 0.2s;
@@ -35,6 +36,40 @@
     .nav-link.active { border-color: rgba(83, 109, 204, 0.55); background: rgba(255, 255, 255, 0.2); font-weight: bold; }
     .login-button { border: 3px solid #6175ca; background: #d6f1dc; font-weight: bold; }
     .nav-link:hover, .login-button:hover { transform: translateY(-1px); opacity: 0.9; }
+
+    /* Бургер-иконка (скрыта на ПК) */
+    .burger-menu-btn {
+      display: none;
+      flex-direction: column;
+      justify-content: space-between;
+      width: 30px;
+      height: 21px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      z-index: 150;
+    }
+    .burger-menu-btn span {
+      display: block;
+      width: 100%;
+      height: 3px;
+      background-color: var(--blue);
+      border-radius: 3px;
+      transition: all 0.3s ease;
+    }
+    
+    /* Анимация превращения бургера в крестик при открытии */
+    .burger-menu-btn.open span:nth-child(1) { transform: translateY(9px) rotate(45deg); }
+    .burger-menu-btn.open span:nth-child(2) { opacity: 0; }
+    .burger-menu-btn.open span:nth-child(3) { transform: translateY(-9px) rotate(-45deg); }
+
+    /* Затемнение фона при открытом мобильном меню */
+    .nav-overlay {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(0, 0, 0, 0.4); z-index: 110;
+      opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+    }
+    .nav-overlay.show { opacity: 1; pointer-events: all; }
 
     /* Вкладки (Табы) */
     .tab-content { display: none; max-width: 1100px; margin: 40px auto; padding: 20px; }
@@ -109,26 +144,60 @@
     .toast.show { opacity: 1; transform: translateY(0); }
 
     /* ==========================================================================
-       Адаптивные стили (Медиа-запросы для мобильных устройств)
+       Адаптивные стили и Выдвижное Бургер-Меню для Мобильных
        ========================================================================== */
     @media (max-width: 992px) {
-      .site-header { padding: 15px 20px; justify-content: center; text-align: center; }
-      .brand-title { font-size: 34px; width: 100%; }
-      .nav { justify-content: center; width: 100%; }
-      .nav-link, .login-button { padding: 10px 15px; font-size: 16px; }
+      .site-header { padding: 15px 20px; min-height: 80px; }
+      .brand-title { font-size: 32px; }
+      
+      /* Активация кнопки бургера */
+      .burger-menu-btn { display: flex; }
 
+      /* Превращаем блок .nav в выдвижную панель справа */
+      .nav {
+        position: fixed;
+        top: 0;
+        right: -280px; /* Полностью скрыто за экраном по умолчанию */
+        width: 280px;
+        height: 100vh;
+        background: #fff;
+        box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+        z-index: 120;
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: flex-start;
+        padding: 80px 20px 20px 20px;
+        gap: 15px;
+        transition: right 0.3s ease-in-out;
+      }
+      
+      /* Класс для выдвижения меню */
+      .nav.open { right: 0; }
+
+      .nav-link, .login-button {
+        width: 100%;
+        text-align: left;
+        padding: 14px 20px;
+        font-size: 16px;
+        border-radius: 10px;
+        background: var(--bg);
+      }
+      .nav-link.active { border-color: var(--blue); background: rgba(83, 109, 204, 0.1); }
+      .login-button { border: 2px solid #6175ca; background: #e2f7e7; text-align: center; margin-top: auto; }
+
+      /* Изменение структуры контента страниц */
       .tab-content.active { grid-template-columns: 1fr; gap: 20px; margin: 20px auto; }
       .home-content h1 { font-size: 36px; text-align: center; }
       .home-text { font-size: 18px; text-align: center; }
       .stats-features { grid-template-columns: 1fr; gap: 15px; }
 
+      /* Адаптация модальных окон */
       .modal-box { grid-template-columns: 1fr; gap: 20px; padding: 25px 15px 15px; width: 100%; max-height: 95vh; }
       .close-modal { top: 5px; right: 10px; }
     }
 
     @media (max-width: 480px) {
-      .brand-title { font-size: 28px; }
-      .nav-link, .login-button { font-size: 14px; padding: 8px 12px; width: 100%; }
+      .brand-title { font-size: 26px; }
       .toolbar { flex-direction: column; }
       .toolbar input, .toolbar select, .toolbar button { width: 100% !important; }
     }
@@ -136,15 +205,24 @@
 </head>
 <body>
 
+  <div class="nav-overlay" id="navOverlay" onclick="toggleMobileMenu(false)"></div>
+
   <header class="site-header">
     <a class="brand" href="#" onclick="switchTab('home')">
       <div class="brand-title">MyFitStats</div>
     </a>
-    <nav class="nav">
-      <button class="nav-link" onclick="openModal('trainingModal')">Дневник тренировок</button>
-      <button class="nav-link" onclick="openModal('nutritionModal')">Дневник питания</button>
-      <button class="nav-link" onclick="openModal('bodyModal')">Оценка тела</button>
-      <button class="login-button" id="headerAuthBtn" onclick="handleHeaderAuthClick()">Вход / Регистрация</button>
+    
+    <button class="burger-menu-btn" id="burgerBtn" onclick="toggleMobileMenu()">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+    <nav class="nav" id="mainNav">
+      <button class="nav-link" onclick="handleMenuAction('trainingModal')">Дневник тренировок</button>
+      <button class="nav-link" onclick="handleMenuAction('nutritionModal')">Дневник питания</button>
+      <button class="nav-link" onclick="handleMenuAction('bodyModal')">Оценка тела</button>
+      <button class="login-button" id="headerAuthBtn" onclick="handleMenuAction('auth')">Вход / Регистрация</button>
     </nav>
   </header>
 
@@ -337,13 +415,42 @@
       selectedNutritionIndex: 0
     };
 
-    // Слушатель изменения состояния авторизации
+    // --- Логика Бургер-Меню (Новое) ---
+    window.toggleMobileMenu = function(flag) {
+      const burgerBtn = document.getElementById('burgerBtn');
+      const mainNav = document.getElementById('mainNav');
+      const overlay = document.getElementById('navOverlay');
+      
+      const shouldOpen = (flag !== undefined) ? flag : !mainNav.classList.contains('open');
+      
+      if (shouldOpen) {
+        burgerBtn.classList.add('open');
+        mainNav.classList.add('open');
+        overlay.classList.add('show');
+      } else {
+        burgerBtn.classList.remove('open');
+        mainNav.classList.remove('open');
+        overlay.classList.remove('show');
+      }
+    }
+
+    // Хэндлер клика по пунктам меню (закрывает бургер перед открытием окна)
+    window.handleMenuAction = function(actionType) {
+      toggleMobileMenu(false); // Закрываем выкатное меню
+      if (actionType === 'auth') {
+        handleHeaderAuthClick();
+      } else {
+        openModal(actionType);
+      }
+    }
+
+    // Слушатель состояния авторизации Firebase
     onAuthStateChanged(auth, (user) => {
       currentUser = user;
       const headerBtn = document.getElementById('headerAuthBtn');
       
       if (user) {
-        headerBtn.textContent = `Выйти (${user.email})`;
+        headerBtn.textContent = `Выйти (${user.email.split('@')[0]})`;
         headerBtn.style.background = "#ffcccc";
         headerBtn.style.borderColor = "#ff9999";
         
@@ -355,9 +462,7 @@
             state.nutrition = data.nutrition || [];
             state.body = data.body || [];
           } else {
-            state.training = [];
-            state.nutrition = [];
-            state.body = [];
+            state.training = []; state.nutrition = []; state.body = [];
           }
           renderAll();
         });
@@ -366,11 +471,8 @@
         headerBtn.style.background = "#d6f1dc";
         headerBtn.style.borderColor = "#6175ca";
         
-        state.training = [];
-        state.nutrition = [];
-        state.body = [];
+        state.training = []; state.nutrition = []; state.body = [];
         state.selectedNutritionIndex = 0;
-        
         renderAll();
       }
     });
@@ -410,9 +512,7 @@
         .then((userCredential) => {
           const uid = userCredential.user.uid;
           set(ref(db, `users/${uid}/profile`), {
-            name: name,
-            email: email,
-            createdAt: new Date().toISOString()
+            name: name, email: email, createdAt: new Date().toISOString()
           }).then(() => {
             showToast('Аккаунт успешно создан!');
             switchTab('home');
@@ -436,9 +536,7 @@
           switchTab('home');
           document.getElementById('loginForm').reset();
         })
-        .catch(() => {
-          showToast('Неверный аккаунт или пароль!');
-        });
+        .catch(() => showToast('Неверный аккаунт или пароль!'));
     });
 
     window.switchTab = function(tabId) {

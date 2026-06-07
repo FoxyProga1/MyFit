@@ -58,7 +58,7 @@
     .modal-box { background: var(--bg); width: 90%; max-width: 1050px; max-height: 85vh; overflow-y: auto; border-radius: 24px; padding: 30px; position: relative; display: grid; grid-template-columns: 42% 58%; gap: 30px; }
     .close-modal { position: absolute; top: 15px; right: 20px; font-size: 30px; cursor: pointer; color: var(--muted); }
 
-    /* Базовые компоненты форм, инпутов и таблиц */
+    /* Компоненты форм */
     .toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
     .toolbar input, .toolbar select, .auth-form input { height: 42px; padding: 0 14px; border: 2px solid rgba(87,114,204,0.3); border-radius: 10px; outline: none; font-size: 14px; background: #fff; }
     .toolbar input, .toolbar select { width: auto; }
@@ -73,17 +73,15 @@
     .date-pill { padding: 4px 12px; border-radius: 12px; background: #e1e1e1; border: none; cursor: pointer; }
     .date-pill.active { background: #cfd9ff; font-weight: bold; }
 
-    /* Графики (Круговой прогресс) */
+    /* Графики */
     .donut { width: 200px; height: 200px; margin: 0 auto 15px; border-radius: 50%; position: relative; background: conic-gradient(var(--blue-dark) 0deg, #d5d5d5 0deg); display: flex; align-items: center; justify-content: center; }
     .donut::before { content: ""; position: absolute; inset: 40px; background: var(--bg); border-radius: 50%; }
     .donut-value { position: relative; font-size: 36px; font-weight: bold; color: #111; z-index: 2; }
 
-    /* Общая стилизация зон для графиков */
     .chart-area { position: relative; height: 220px; padding: 20px 10px 40px 40px; background: #fff; border-radius: 12px; border: 1px solid #ddd; margin-bottom: 20px; }
     .grid-line { position: absolute; left: 40px; right: 10px; height: 1px; background: #eee; }
     .grid-line span { position: absolute; left: -35px; top: -8px; font-size: 11px; }
     
-    /* Столбцы */
     .bars { position: absolute; left: 50px; right: 10px; bottom: 40px; top: 20px; display: flex; align-items: flex-end; gap: 10px; }
     .bar-group { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; }
     .bar { width: 100%; border-radius: 6px 6px 0 0; transition: height 0.25s; min-height: 2px; }
@@ -94,7 +92,6 @@
     .bar-label { margin-top: 6px; font-size: 11px; white-space: nowrap; }
     .bar-value { margin-bottom: 4px; font-size: 11px; font-weight: bold; color: var(--blue-dark); }
 
-    /* Виджет ИМТ */
     .bmi-display { background: #fff; padding: 20px; border-radius: 16px; border: 2px solid rgba(87,114,204,0.15); margin-top: 15px; text-align: center; }
     .bmi-value { font-size: 36px; font-weight: bold; color: var(--blue-dark); margin: 5px 0; }
     .bmi-status { font-size: 16px; font-weight: bold; color: #5f6d91; }
@@ -161,6 +158,7 @@
     <div class="auth-card" id="register-block" style="display: none;">
       <h2>Регистрация</h2>
       <form class="auth-form" id="registerForm">
+        <input type="text" id="regName" placeholder="Ваше имя" required />
         <input type="email" id="regEmail" placeholder="Укажите Email" required />
         <input type="password" id="regPass" placeholder="Придумайте пароль (от 6 символов)" required />
         <input type="password" id="regPassConfirm" placeholder="Повторите пароль" required />
@@ -278,7 +276,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, set, onValue, get, child } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
     const firebaseConfig = {
@@ -305,20 +303,30 @@
       selectedNutritionIndex: 0
     };
 
-    // Слушатель изменения состояния авторизации
+    // Слушатель состояния авторизации
     onAuthStateChanged(auth, (user) => {
       currentUser = user;
       const headerBtn = document.getElementById('headerAuthBtn');
       
       if (user) {
-        // Пользователь залогинен
-        headerBtn.textContent = `Выйти (${user.email.split('@')[0]})`;
+        // Подгружаем имя профиля напрямую из Firebase Realtime Database
+        get(ref(db, `users/${user.uid}/profile`)).then((snapshot) => {
+          let userName = "Пользователь";
+          if (snapshot.exists() && snapshot.val().name) {
+            userName = snapshot.val().name;
+          } else {
+            userName = user.email.split('@')[0];
+          }
+          headerBtn.textContent = `Выйти (${userName})`;
+        }).catch(() => {
+          headerBtn.textContent = `Выйти (${user.email.split('@')[0]})`;
+        });
+
         headerBtn.style.background = "#ffcccc";
         headerBtn.style.borderColor = "#ff9999";
         
-        // Подключаем персональную ветку данных пользователя: users/uid/fitData
+        // Слушаем ветку дневников (fitData) конкретного аккаунта
         const userDbRef = ref(db, `users/${user.uid}/fitData`);
-        
         dbListenerRef = onValue(userDbRef, (snapshot) => {
           const data = snapshot.val();
           if (data) {
@@ -333,7 +341,7 @@
           renderAll();
         });
       } else {
-        // Пользователь вышел
+        // Если никто не авторизован
         headerBtn.textContent = "Вход / Регистрация";
         headerBtn.style.background = "#d6f1dc";
         headerBtn.style.borderColor = "#6175ca";
@@ -344,11 +352,10 @@
         state.selectedNutritionIndex = 0;
         
         renderAll();
-        showToast("Войдите в систему для просмотра и редактирования данных.");
       }
     });
 
-    // Синхронизация данных с Firebase в ветку конкретного пользователя
+    // Синхронизация данных текущего аккаунта
     function syncWithFirebase() {
       if (!currentUser) return showToast("Ошибка: Вы не авторизованы!");
       set(ref(db, `users/${currentUser.uid}/fitData`), {
@@ -358,11 +365,10 @@
       }).catch(err => showToast("Ошибка синхронизации с облаком"));
     }
 
-    // Обработка клика по кнопке в Хедере
     window.handleHeaderAuthClick = function() {
       if (currentUser) {
         signOut(auth).then(() => {
-          showToast("Вы успешно вышли из аккаунта.");
+          showToast("Вы вышли из аккаунта.");
           switchTab('home');
         }).catch(err => showToast("Ошибка при выходе"));
       } else {
@@ -370,42 +376,52 @@
       }
     }
 
-    // Регистрация через Firebase Auth
+    // Регистрация аккаунта с занесением имени и почты в профиль Firebase Database
     document.getElementById('registerForm').addEventListener('submit', (e) => {
       e.preventDefault();
+      const name = document.getElementById('regName').value.trim();
       const email = document.getElementById('regEmail').value.trim();
       const pass = document.getElementById('regPass').value;
       const passConfirm = document.getElementById('regPassConfirm').value;
 
+      if (!name) return showToast('Укажите ваше имя!');
       if (pass !== passConfirm) return showToast('Ошибка: Пароли не совпадают!');
-      if (pass.length < 6) return showToast('Пароль должен быть не менее 6 символов!');
+      if (pass.length < 6) return showToast('Пароль должен быть от 6 символов!');
 
       createUserWithEmailAndPassword(auth, email, pass)
         .then((userCredential) => {
-          showToast('Регистрация успешна! Добро пожаловать.');
-          switchTab('home');
-          document.getElementById('registerForm').reset();
+          const uid = userCredential.user.uid;
+          // Сохраняем имя и данные аккаунта в ветку users/uid/profile
+          set(ref(db, `users/${uid}/profile`), {
+            name: name,
+            email: email,
+            createdAt: new Date().toISOString()
+          }).then(() => {
+            showToast('Аккаунт успешно создан!');
+            switchTab('home');
+            document.getElementById('registerForm').reset();
+          });
         })
         .catch((error) => {
-          if (error.code === 'auth/email-already-in-use') showToast('Этот Email уже используется!');
-          else showToast(`Ошибка регистрации: ${error.message}`);
+          if (error.code === 'auth/email-already-in-use') showToast('Этот Email уже занят!');
+          else showToast(`Ошибка: ${error.message}`);
         });
     });
 
-    // Вход через Firebase Auth
+    // Вход в существующий аккаунт
     document.getElementById('loginForm').addEventListener('submit', (e) => {
       e.preventDefault();
       const email = document.getElementById('loginEmail').value.trim();
       const pass = document.getElementById('loginPass').value;
 
       signInWithEmailAndPassword(auth, email, pass)
-        .then((userCredential) => {
-          showToast('Успешный вход в систему!');
+        .then(() => {
+          showToast('Вы успешно вошли.');
           switchTab('home');
           document.getElementById('loginForm').reset();
         })
-        .catch((error) => {
-          showToast('Неверный Email или пароль!');
+        .catch(() => {
+          showToast('Неверный аккаунт или пароль!');
         });
     });
 
@@ -420,23 +436,23 @@
       document.getElementById('register-block').style.display = showLogin ? 'none' : 'block';
     }
 
-    // Управление модальными окнами и заглушками для неавторизованных
     window.openModal = function(id) {
       const modal = document.getElementById(id);
       modal.style.display = 'flex';
       setTimeout(() => modal.classList.add('show'), 10);
       
-      const contentBoxMap = {
+      const boxes = {
         'trainingModal': 'trainingContentBox',
         'nutritionModal': 'nutritionContentBox',
         'bodyModal': 'bodyContentBox'
       };
 
-      const contentBox = document.getElementById(contentBoxMap[id]);
+      const contentBox = document.getElementById(boxes[id]);
       if (contentBox) {
         if (!currentUser) {
-          contentBox.style.opacity = '0.3';
+          contentBox.style.opacity = '0.25';
           contentBox.style.pointerEvents = 'none';
+          showToast("Пожалуйста, авторизуйтесь для доступа к дневнику.");
         } else {
           contentBox.style.opacity = '1';
           contentBox.style.pointerEvents = 'all';
@@ -444,6 +460,7 @@
       }
       renderAll();
     }
+    
     window.closeModal = function(id) {
       const modal = document.getElementById(id);
       modal.classList.remove('show');

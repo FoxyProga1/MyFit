@@ -47,7 +47,7 @@
       background: transparent;
       border: none;
       cursor: pointer;
-      z-index: 130; /* ИСПРАВЛЕНО: Самый верхний уровень, чтобы бургер всегда кликался */
+      z-index: 130;
     }
     .burger-menu-btn span {
       display: block;
@@ -65,7 +65,7 @@
     .nav-overlay {
       position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
       background: rgba(0, 0, 0, 0.4); 
-      z-index: 110; /* ИСПРАВЛЕНО: Ниже, чем само меню */
+      z-index: 110;
       opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
     }
     .nav-overlay.show { opacity: 1; pointer-events: all; }
@@ -147,7 +147,10 @@
       .site-header { padding: 15px 20px; min-height: 80px; }
       .brand-title { font-size: 32px; }
       
-      .burger-menu-btn { display: flex; }
+      .burger-menu-btn { 
+        display: flex; 
+        z-index: 150; /* Поднимаем бургер выше выдвижной панели навигации */
+      }
 
       /* Выезжающая боковая панель */
       .nav {
@@ -164,7 +167,7 @@
         padding: 80px 20px 20px 20px;
         gap: 15px;
         transition: right 0.3s ease-in-out;
-        z-index: 120; /* ИСПРАВЛЕНО: Меню теперь поверх оверлея затемнения */
+        z-index: 140; /* ИСПРАВЛЕНО: Теперь навигация выше оверлея (110), кнопки будут нажиматься */
       }
       .nav.open { right: 0; }
 
